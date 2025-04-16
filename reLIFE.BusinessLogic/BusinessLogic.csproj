@@ -8,12 +8,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\reLIFE.Core\reLIFE.Core.csproj" />
+    <ProjectReference Include="..\reLIFE.DataAccess\reLIFE.DataAccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
+    <Folder Include="Calculation\" />
+    <Folder Include="Validation\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

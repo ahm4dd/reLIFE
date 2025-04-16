@@ -7,13 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Enums\" />
-    <Folder Include="Common\Helpers\" />
-    <Folder Include="Interfaces\Security\" />
-    <Folder Include="Interfaces\Services\" />
-    <Folder Include="Interfaces\Repositories\" />
-    <Folder Include="Models\Entities\" />
-    <Folder Include="Security\" />
+    <Folder Include="Common\" />
   </ItemGroup>
 
 </Project>

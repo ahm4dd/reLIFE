@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reLIFE.WinFormsUI", "reLIFE.WinFormsUI\reLIFE.WinFormsUI.csproj", "{27997EDB-7F48-4D62-9C3D-BEEE4DD6C9A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reLIFE.Core", "reLIFE.Core\reLIFE.Core.csproj", "{8A07332B-9E64-42B9-9CB6-65D6A94A3FE4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reLIFE.DataAccess", "reLIFE.DataAccess\reLIFE.DataAccess.csproj", "{0F5231F8-D7B3-45C0-B44B-6BE6BE4B192A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reLIFE.BusinessLogic", "reLIFE.BusinessLogic\reLIFE.BusinessLogic.csproj", "{8E2D4983-DA29-4DC8-B497-B6D7139793E0}"
 EndProject
@@ -25,10 +23,6 @@ Global
 		{8A07332B-9E64-42B9-9CB6-65D6A94A3FE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A07332B-9E64-42B9-9CB6-65D6A94A3FE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A07332B-9E64-42B9-9CB6-65D6A94A3FE4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0F5231F8-D7B3-45C0-B44B-6BE6BE4B192A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F5231F8-D7B3-45C0-B44B-6BE6BE4B192A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F5231F8-D7B3-45C0-B44B-6BE6BE4B192A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F5231F8-D7B3-45C0-B44B-6BE6BE4B192A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8E2D4983-DA29-4DC8-B497-B6D7139793E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E2D4983-DA29-4DC8-B497-B6D7139793E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E2D4983-DA29-4DC8-B497-B6D7139793E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
