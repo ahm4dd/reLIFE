@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+appsettings.json
+/reLIFE.WinFormsUI/Forms/Form1.cs
+/reLIFE.WinFormsUI/appsettings.json
