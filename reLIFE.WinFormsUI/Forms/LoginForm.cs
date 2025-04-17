@@ -1,3 +1,4 @@
+using MaterialSkin.Controls;
 using Microsoft.Data.SqlClient;
 using reLIFE.BusinessLogic.Data;
 using reLIFE.BusinessLogic.Repositories;
@@ -10,7 +11,7 @@ using System.Windows.Forms;
 
 namespace reLIFE.WinFormsUI
 {
-    public partial class LoginForm : Form
+    public partial class LoginForm : MaterialForm
     {
         // Service dependency (provided via constructor)
         private readonly AuthService _authService;
@@ -85,7 +86,8 @@ namespace reLIFE.WinFormsUI
             // but maybe shouldn't be modal *blocking* the login form which is the
             // main app form for now. Showing it non-modally might be better.
             var registrationForm = new RegistrationForm(_authService);
-            registrationForm.Show(this); // Show non-modally, owned by Login Form
+            registrationForm.Show(this); // Show non-modally, owned by Login 
+            this.Hide();
             // Or use ShowDialog if blocking behaviour is ok.
         }
 
@@ -153,6 +155,11 @@ namespace reLIFE.WinFormsUI
         {
             lblError.Text = message ?? "";
             lblError.Visible = !string.IsNullOrEmpty(message);
+        }
+
+        private void boxShow_CheckedChanged(object sender, EventArgs e)
+        {
+            txtPassword.PasswordChar = boxShow.Checked ? '\0' : '*';
         }
     }
 }
