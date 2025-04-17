@@ -12,7 +12,7 @@ namespace reLIFE.BusinessLogic.Validators
         // Define constraints
         private const int MinUsernameLength = 3;
         private const int MaxUsernameLength = 100; // Should match DB
-        private const int MinPasswordLength = 6; // Example minimum length
+        private const int MinPasswordLength = 8; // Example minimum length
         private const int MaxEmailLength = 255;  // Should match DB
 
         // --- Regular Expressions ---
