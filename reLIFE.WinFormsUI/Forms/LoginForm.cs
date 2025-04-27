@@ -94,13 +94,19 @@ namespace reLIFE.WinFormsUI
 
         private void lnkRegister_Click(object sender, EventArgs e)
         {
-            // This part is tricky now. The register form still needs the AuthService,
-            // but maybe shouldn't be modal *blocking* the login form which is the
-            // main app form for now. Showing it non-modally might be better.
-            var registrationForm = new RegistrationForm(_authService);
-            registrationForm.Show(this); // Show non-modally, owned by Login 
-            this.Hide();
-            // Or use ShowDialog if blocking behaviour is ok.
+            // Show Registration Form modally, consistent with Program.cs flow
+            using (var registrationForm = new RegistrationForm(_authService))
+            {
+                // this.Hide(); // Optional: Hide login while register is shown
+                registrationForm.ShowDialog(this); // Show modally, centered on parent
+                // this.Show(); // Optional: Show login again if it was hidden
+
+                // Reset focus after registration form closes (whether cancelled or successful)
+                this.ActiveControl = txtUsername;
+                // Optionally clear fields after registration attempt?
+                // txtUsername.Clear();
+                // txtPassword.Clear();
+            }
         }
 
         private void txtPassword_KeyDown(object sender, KeyEventArgs e)
