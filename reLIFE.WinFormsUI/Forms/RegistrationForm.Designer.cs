@@ -278,7 +278,9 @@
             Controls.Add(txtUsernameReg);
             Controls.Add(lblUsername);
             Controls.Add(getStarted);
+            MaximizeBox = false;
             Name = "RegistrationForm";
+            Sizable = false;
             Text = "RegistrationForm";
             Load += RegistrationForm_Load;
             ResumeLayout(false);

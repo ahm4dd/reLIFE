@@ -223,7 +223,9 @@
             Controls.Add(Password);
             Controls.Add(Username);
             Controls.Add(GetStarted);
+            MaximizeBox = false;
             Name = "LoginForm";
+            Sizable = false;
             Text = "LoginForm";
             Load += LoginForm_Load;
             ResumeLayout(false);
