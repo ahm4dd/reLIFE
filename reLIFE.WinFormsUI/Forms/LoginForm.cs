@@ -34,50 +34,62 @@ namespace reLIFE.WinFormsUI
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Text;
 
-            ShowError(null);
+            ShowError(null); // Clear previous errors
 
             // --- Use Validator ---
             var usernameValidation = Validation.ValidateUsername(username);
-            if (!usernameValidation.IsValid) { ShowError(usernameValidation.ErrorMessage); txtUsername.Focus(); txtUsername.SelectAll(); return; }
+            if (!usernameValidation.IsValid)
+            {
+                ShowError(usernameValidation.ErrorMessage);
+                SetActiveControl(txtUsername);
+                return;
+            }
+
             var passwordValidation = Validation.ValidatePassword(password);
-            if (!passwordValidation.IsValid) { ShowError(passwordValidation.ErrorMessage); txtPassword.Focus(); txtPassword.SelectAll(); return; }
+            if (!passwordValidation.IsValid)
+            {
+                ShowError(passwordValidation.ErrorMessage);
+                SetActiveControl(txtPassword);
+                return;
+            }
 
             // --- Attempt Login ---
-            SetProcessingState(true);
-
-            User? loggedInUser = null; // Variable to hold the user if successful
+            SetProcessingState(true); // Disable UI, show wait cursor
 
             try
             {
-                loggedInUser = _authService.Login(username, password);
+                // Call the synchronous Login method
+                User? user = _authService.Login(username, password);
 
-                if (loggedInUser != null)
+                if (user != null)
                 {
-                    // --- Login Successful - Launch MainForm ---
-                    LaunchMainApplication(loggedInUser); // Call helper to load next stage
-                    this.Hide(); // Hide the login form after successfully launching main
+                    // --- Login Successful ---
+                    this.LoggedInUser = user;           // Store the user in the public property
+                    this.DialogResult = DialogResult.OK; // Signal success to Program.cs
+                    // The form will close automatically because DialogResult is set
                 }
                 else
                 {
                     // --- Login Failed ---
                     ShowError("Invalid username or password.");
-                    txtPassword.Focus();
-                    txtPassword.SelectAll();
-                    SetProcessingState(false); // Reset UI only on failure
+                    SetActiveControl(txtPassword);
+                    SetProcessingState(false); // Re-enable UI on failure
                 }
             }
-            catch (ApplicationException appEx)
+            catch (ApplicationException appEx) // Catch errors from service/repo/dbhelper
             {
                 Console.WriteLine($"Login Application Exception: {appEx}");
                 ShowError($"Login Error: {appEx.Message}");
-                SetProcessingState(false);
+                SetProcessingState(false); // Re-enable UI
             }
-            catch (Exception ex)
+            catch (Exception ex) // Catch unexpected errors
             {
                 Console.WriteLine($"Login Unexpected Exception: {ex}");
                 ShowError("An unexpected error occurred. Please try again.");
-                SetProcessingState(false);
+                SetProcessingState(false); // Re-enable UI
             }
+            // If successful, form closes via DialogResult before reaching here.
+            // If failed, SetProcessingState(false) was called in the relevant block.
         }
 
         private void lnkRegister_Click(object sender, EventArgs e)
@@ -93,41 +105,13 @@ namespace reLIFE.WinFormsUI
 
         private void txtPassword_KeyDown(object sender, KeyEventArgs e)
         {
+            // Only process if login button is enabled (i.e., not already processing)
             if (!btnLogin.Enabled) return;
-            if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; btnLogin.PerformClick(); }
-        }
 
-        private void LaunchMainApplication(User loggedInUser)
-        {
-            // We need the connection string again here to create other repos/services
-            try
+            if (e.KeyCode == Keys.Enter)
             {
-                string connectionString = DbHelper.GetConnectionString(); // Get it again
-
-                // Create Remaining Dependencies
-                var categoryRepository = new CategoryRepository(connectionString);
-                var eventRepository = new EventRepository(connectionString);
-                var categoryService = new CategoryService(categoryRepository);
-                var eventService = new EventService(eventRepository, categoryRepository);
-
-                // Create and Show MainForm
-                var mainForm = new MainForm(loggedInUser, eventService, categoryService);
-
-                // IMPORTANT: Handle closing - When MainForm closes, exit the whole app.
-                mainForm.FormClosed += MainForm_FormClosed;
-
-                mainForm.Show();
-                // Don't call this.Hide() here - do it AFTER calling Show()
-            }
-            catch (Exception ex)
-            {
-                // Log details
-                Console.WriteLine($"ERROR launching main application: {ex}");
-                MessageBox.Show($"Failed to load the main application.\nError: {ex.Message}\n\nThe application might need to close.",
-                                "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                SetProcessingState(false); // Re-enable login form UI maybe?
-                                           // Or Application.Exit(); might be safer here
-                Application.Exit();
+                e.SuppressKeyPress = true; // Prevent the 'ding' sound on Enter
+                btnLogin.PerformClick();   // Simulate clicking the login button
             }
         }
 
@@ -146,6 +130,7 @@ namespace reLIFE.WinFormsUI
             txtUsername.Enabled = !processing;
             txtPassword.Enabled = !processing;
             btnLogin.Enabled = !processing;
+            boxShow.Enabled = !processing; // Assuming 'boxShow' is the checkbox name
             lnkRegister.Enabled = !processing;
             this.Cursor = processing ? Cursors.WaitCursor : Cursors.Default;
             Application.DoEvents(); // Try to force UI update
@@ -153,13 +138,33 @@ namespace reLIFE.WinFormsUI
 
         private void ShowError(string? message)
         {
-            lblError.Text = message ?? "";
-            lblError.Visible = !string.IsNullOrEmpty(message);
+            // Assuming lblError is the name of your error Label control
+            if (lblError != null) // Check if label exists
+            {
+                lblError.Text = message ?? "";
+                lblError.Visible = !string.IsNullOrEmpty(message);
+            }
+            else // Fallback or alternative: MessageBox
+            {
+                if (!string.IsNullOrEmpty(message))
+                {
+                    MessageBox.Show(message, "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
         }
 
         private void boxShow_CheckedChanged(object sender, EventArgs e)
         {
             txtPassword.PasswordChar = boxShow.Checked ? '\0' : '*';
+        }
+
+        private void SetActiveControl(Control control)
+        {
+            this.ActiveControl = control;
+            if (control is TextBoxBase textBox)
+            {
+                textBox.SelectAll();
+            }
         }
     }
 }
