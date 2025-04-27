@@ -18,39 +18,36 @@ namespace reLIFE.WinFormsUI.Forms
         // --- Private Fields for Dependencies ---
         // These services and the user are provided by the constructor (passed from login process)
 
-        private readonly User _currentUser;             // Holds the logged-in user details
-        private readonly EventService _eventService;     // Service for handling event operations
-        private readonly CategoryService _categoryService; // Service for handling category operations
+        private readonly User _currentUser;
+        private readonly EventService _eventService;
+        private readonly CategoryService _categoryService;
+        private readonly ReminderService _reminderService; // *** ADDED Dependency ***
 
-        // --- Fields for UI State and Data ---
-
-        private List<Category> _userCategories = new List<Category>(); // Cache categories for dropdowns/filtering
-        private List<Event> _currentEvents = new List<Event>();       // Cache events currently displayed
-
-
-        // Example: Could add fields for current view type (Day, Week, Month), selected date, etc.
-        // private ViewType _currentView = ViewType.Month; // Assuming ViewType enum exists
+        // --- UI State & Data ---
+        private List<Category> _userCategories = new List<Category>();
+        private List<Event> _currentEvents = new List<Event>();
         private DateTime _selectedDate = DateTime.Today;
+        // Add other state fields like _currentView, _selectedFilterCategories etc.
 
-        // --- Constructor ---
-
-        /// <summary>
-        /// Initializes a new instance of the MainForm.
-        /// </summary>
-        /// <param name="currentUser">The authenticated user who logged in.</param>
-        /// <param name="eventService">The service for event management.</param>
-        /// <param name="categoryService">The service for category management.</param>
-        public MainForm(User currentUser, EventService eventService, CategoryService categoryService)
+        // --- MODIFIED Constructor ---
+        public MainForm(
+            User currentUser,
+            EventService eventService,
+            CategoryService categoryService,
+            ReminderService reminderService // *** ADDED Parameter ***
+            )
         {
             InitializeComponent();
 
             // --- Store Dependencies ---
-            // Perform null checks to ensure dependencies are provided
             _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
             _eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
+            _reminderService = reminderService ?? throw new ArgumentNullException(nameof(reminderService)); // *** Store ReminderService ***
 
-            // Add other constructor initialization if needed (e.g., setting initial UI state variables)
+            // --- Initial UI Setup ---
+            // Setup ListView columns, Calendar settings etc. here if not done in Designer
+            //SetupListViewColumns(); // Example call
         }
 
         private void MainForm_Load(object sender, EventArgs e)
