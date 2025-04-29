@@ -28,39 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            getStarted = new Label();
-            lblUsername = new Label();
             txtUsernameReg = new MaterialSkin.Controls.MaterialTextBox2();
             txtPasswordReg = new MaterialSkin.Controls.MaterialTextBox2();
-            lblPassword = new Label();
             btnRegister = new MaterialSkin.Controls.MaterialButton();
             btnCancelReg = new MaterialSkin.Controls.MaterialButton();
             txtConfirmPasswordReg = new MaterialSkin.Controls.MaterialTextBox2();
-            lblConfirmPassword = new Label();
             txtEmailReg = new MaterialSkin.Controls.MaterialTextBox2();
-            lblEmail = new Label();
-            lblErrorReg = new Label();
+            lblErrorReg = new MaterialSkin.Controls.MaterialLabel();
+            materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
+            materialLabel2 = new MaterialSkin.Controls.MaterialLabel();
+            materialLabel3 = new MaterialSkin.Controls.MaterialLabel();
+            materialLabel4 = new MaterialSkin.Controls.MaterialLabel();
             SuspendLayout();
-            // 
-            // getStarted
-            // 
-            getStarted.AutoSize = true;
-            getStarted.Font = new Font("Lucida Sans", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            getStarted.Location = new Point(95, 83);
-            getStarted.Name = "getStarted";
-            getStarted.Size = new Size(143, 27);
-            getStarted.TabIndex = 0;
-            getStarted.Text = "Get Started";
-            // 
-            // lblUsername
-            // 
-            lblUsername.AutoSize = true;
-            lblUsername.Font = new Font("Lucida Sans", 12.75F);
-            lblUsername.Location = new Point(30, 140);
-            lblUsername.Name = "lblUsername";
-            lblUsername.Size = new Size(98, 19);
-            lblUsername.TabIndex = 1;
-            lblUsername.Text = "Username:";
             // 
             // txtUsernameReg
             // 
@@ -72,7 +51,7 @@
             txtUsernameReg.HideSelection = true;
             txtUsernameReg.Hint = "Enter username (E.g. ahm4dd)";
             txtUsernameReg.LeadingIcon = null;
-            txtUsernameReg.Location = new Point(30, 162);
+            txtUsernameReg.Location = new Point(27, 108);
             txtUsernameReg.MaxLength = 32767;
             txtUsernameReg.MouseState = MaterialSkin.MouseState.OUT;
             txtUsernameReg.Name = "txtUsernameReg";
@@ -101,7 +80,7 @@
             txtPasswordReg.HideSelection = true;
             txtPasswordReg.Hint = "Enter password (E.g. securePass1)";
             txtPasswordReg.LeadingIcon = null;
-            txtPasswordReg.Location = new Point(30, 308);
+            txtPasswordReg.Location = new Point(27, 262);
             txtPasswordReg.MaxLength = 32767;
             txtPasswordReg.MouseState = MaterialSkin.MouseState.OUT;
             txtPasswordReg.Name = "txtPasswordReg";
@@ -120,16 +99,6 @@
             txtPasswordReg.TrailingIcon = null;
             txtPasswordReg.UseSystemPasswordChar = false;
             // 
-            // lblPassword
-            // 
-            lblPassword.AutoSize = true;
-            lblPassword.Font = new Font("Lucida Sans", 12.75F);
-            lblPassword.Location = new Point(30, 286);
-            lblPassword.Name = "lblPassword";
-            lblPassword.Size = new Size(95, 19);
-            lblPassword.TabIndex = 3;
-            lblPassword.Text = "Password:";
-            // 
             // btnRegister
             // 
             btnRegister.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -137,7 +106,7 @@
             btnRegister.Depth = 0;
             btnRegister.HighEmphasis = true;
             btnRegister.Icon = null;
-            btnRegister.Location = new Point(220, 498);
+            btnRegister.Location = new Point(217, 474);
             btnRegister.Margin = new Padding(4, 6, 4, 6);
             btnRegister.MouseState = MaterialSkin.MouseState.HOVER;
             btnRegister.Name = "btnRegister";
@@ -159,7 +128,7 @@
             btnCancelReg.Depth = 0;
             btnCancelReg.HighEmphasis = true;
             btnCancelReg.Icon = null;
-            btnCancelReg.Location = new Point(30, 498);
+            btnCancelReg.Location = new Point(27, 474);
             btnCancelReg.Margin = new Padding(4, 6, 4, 6);
             btnCancelReg.MouseState = MaterialSkin.MouseState.HOVER;
             btnCancelReg.Name = "btnCancelReg";
@@ -182,7 +151,7 @@
             txtConfirmPasswordReg.HideSelection = true;
             txtConfirmPasswordReg.Hint = "Re-enter your password";
             txtConfirmPasswordReg.LeadingIcon = null;
-            txtConfirmPasswordReg.Location = new Point(30, 391);
+            txtConfirmPasswordReg.Location = new Point(27, 345);
             txtConfirmPasswordReg.MaxLength = 32767;
             txtConfirmPasswordReg.MouseState = MaterialSkin.MouseState.OUT;
             txtConfirmPasswordReg.Name = "txtConfirmPasswordReg";
@@ -201,16 +170,6 @@
             txtConfirmPasswordReg.TrailingIcon = null;
             txtConfirmPasswordReg.UseSystemPasswordChar = false;
             // 
-            // lblConfirmPassword
-            // 
-            lblConfirmPassword.AutoSize = true;
-            lblConfirmPassword.Font = new Font("Lucida Sans", 12.75F);
-            lblConfirmPassword.Location = new Point(30, 369);
-            lblConfirmPassword.Name = "lblConfirmPassword";
-            lblConfirmPassword.Size = new Size(169, 19);
-            lblConfirmPassword.TabIndex = 16;
-            lblConfirmPassword.Text = "Confirm Password:";
-            // 
             // txtEmailReg
             // 
             txtEmailReg.AnimateReadOnly = false;
@@ -221,7 +180,7 @@
             txtEmailReg.HideSelection = true;
             txtEmailReg.Hint = "Enter email (E.g. AJ@gmail.com)";
             txtEmailReg.LeadingIcon = null;
-            txtEmailReg.Location = new Point(30, 235);
+            txtEmailReg.Location = new Point(27, 185);
             txtEmailReg.MaxLength = 32767;
             txtEmailReg.MouseState = MaterialSkin.MouseState.OUT;
             txtEmailReg.Name = "txtEmailReg";
@@ -240,44 +199,81 @@
             txtEmailReg.TrailingIcon = null;
             txtEmailReg.UseSystemPasswordChar = false;
             // 
-            // lblEmail
-            // 
-            lblEmail.AutoSize = true;
-            lblEmail.Font = new Font("Lucida Sans", 12.75F);
-            lblEmail.Location = new Point(30, 213);
-            lblEmail.Name = "lblEmail";
-            lblEmail.Size = new Size(61, 19);
-            lblEmail.TabIndex = 18;
-            lblEmail.Text = "Email:";
-            // 
             // lblErrorReg
             // 
-            lblErrorReg.BackColor = Color.Transparent;
-            lblErrorReg.FlatStyle = FlatStyle.Flat;
-            lblErrorReg.Font = new Font("Segoe UI Semibold", 7.75F, FontStyle.Bold);
-            lblErrorReg.ForeColor = Color.IndianRed;
-            lblErrorReg.Location = new Point(30, 442);
+            lblErrorReg.AutoSize = true;
+            lblErrorReg.Depth = 0;
+            lblErrorReg.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblErrorReg.Location = new Point(28, 396);
+            lblErrorReg.MouseState = MaterialSkin.MouseState.HOVER;
             lblErrorReg.Name = "lblErrorReg";
-            lblErrorReg.Size = new Size(279, 50);
-            lblErrorReg.TabIndex = 22;
+            lblErrorReg.Size = new Size(1, 0);
+            lblErrorReg.TabIndex = 23;
+            // 
+            // materialLabel1
+            // 
+            materialLabel1.AutoSize = true;
+            materialLabel1.Depth = 0;
+            materialLabel1.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel1.Location = new Point(28, 81);
+            materialLabel1.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel1.Name = "materialLabel1";
+            materialLabel1.Size = new Size(76, 19);
+            materialLabel1.TabIndex = 24;
+            materialLabel1.Text = "Username:";
+            // 
+            // materialLabel2
+            // 
+            materialLabel2.AutoSize = true;
+            materialLabel2.Depth = 0;
+            materialLabel2.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel2.Location = new Point(27, 160);
+            materialLabel2.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel2.Name = "materialLabel2";
+            materialLabel2.Size = new Size(45, 19);
+            materialLabel2.TabIndex = 25;
+            materialLabel2.Text = "Email:";
+            // 
+            // materialLabel3
+            // 
+            materialLabel3.AutoSize = true;
+            materialLabel3.Depth = 0;
+            materialLabel3.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel3.Location = new Point(27, 236);
+            materialLabel3.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel3.Name = "materialLabel3";
+            materialLabel3.Size = new Size(75, 19);
+            materialLabel3.TabIndex = 26;
+            materialLabel3.Text = "Password:";
+            // 
+            // materialLabel4
+            // 
+            materialLabel4.AutoSize = true;
+            materialLabel4.Depth = 0;
+            materialLabel4.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel4.Location = new Point(27, 315);
+            materialLabel4.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel4.Name = "materialLabel4";
+            materialLabel4.Size = new Size(136, 19);
+            materialLabel4.TabIndex = 27;
+            materialLabel4.Text = "Confirm Password:";
             // 
             // RegistrationForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(334, 549);
+            ClientSize = new Size(334, 536);
+            Controls.Add(materialLabel4);
+            Controls.Add(materialLabel3);
+            Controls.Add(materialLabel2);
+            Controls.Add(materialLabel1);
             Controls.Add(lblErrorReg);
             Controls.Add(txtEmailReg);
-            Controls.Add(lblEmail);
             Controls.Add(txtConfirmPasswordReg);
-            Controls.Add(lblConfirmPassword);
             Controls.Add(btnCancelReg);
             Controls.Add(btnRegister);
             Controls.Add(txtPasswordReg);
-            Controls.Add(lblPassword);
             Controls.Add(txtUsernameReg);
-            Controls.Add(lblUsername);
-            Controls.Add(getStarted);
             MaximizeBox = false;
             Name = "RegistrationForm";
             Sizable = false;
@@ -288,18 +284,16 @@
         }
 
         #endregion
-
-        private Label getStarted;
-        private Label lblUsername;
         private MaterialSkin.Controls.MaterialTextBox2 txtUsernameReg;
         private MaterialSkin.Controls.MaterialTextBox2 txtPasswordReg;
-        private Label lblPassword;
         private MaterialSkin.Controls.MaterialButton btnRegister;
         private MaterialSkin.Controls.MaterialButton btnCancelReg;
         private MaterialSkin.Controls.MaterialTextBox2 txtConfirmPasswordReg;
-        private Label lblConfirmPassword;
         private MaterialSkin.Controls.MaterialTextBox2 txtEmailReg;
-        private Label lblEmail;
-        private Label lblErrorReg;
+        private MaterialSkin.Controls.MaterialLabel lblErrorReg;
+        private MaterialSkin.Controls.MaterialLabel materialLabel1;
+        private MaterialSkin.Controls.MaterialLabel materialLabel2;
+        private MaterialSkin.Controls.MaterialLabel materialLabel3;
+        private MaterialSkin.Controls.MaterialLabel materialLabel4;
     }
 }

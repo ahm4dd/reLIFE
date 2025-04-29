@@ -9,19 +9,14 @@ using reLIFE.BusinessLogic.Security;       // For PasswordHasher
 using reLIFE.BusinessLogic.Services;       // For Services
 using reLIFE.Core.Models;           // For User model
 using reLIFE.WinFormsUI.Forms;      // For your form classes
+using Microsoft.Data.SqlClient;           // Needed for connection test
 
 namespace reLIFE.WinFormsUI
 {
     internal static class Program
     {
-        /// <summary>
-        /// Stores the currently logged-in user after successful authentication.
-        /// </summary>
         public static User? CurrentUser { get; private set; }
 
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
@@ -29,89 +24,128 @@ namespace reLIFE.WinFormsUI
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Declare services needed throughout the application lifecycle
+            // Declare services needed - initialize within try block
             AuthService? authService = null;
             EventService? eventService = null;
             CategoryService? categoryService = null;
             ReminderService? reminderService = null;
+            UserService? userService = null;
+            string connectionString = string.Empty;
 
             try
             {
                 // --- Step 1: Get Connection String ---
-                string connectionString = DbHelper.GetConnectionString();
+                connectionString = DbHelper.GetConnectionString();
+                Console.WriteLine($"Loaded Connection String: [Length={connectionString.Length}]");
+
+                // --- Optional Step 1.5: Test Connection ---
+#if DEBUG
+                try
+                {
+                    Console.WriteLine("Attempting database connection test...");
+                    using (var testConnection = new SqlConnection(connectionString)) { testConnection.Open(); }
+                    Console.WriteLine("Database connection test successful.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"!!! Database Connection Test FAILED: {ex.Message}");
+                    MessageBox.Show($"Database Connection Failed:\n{ex.Message}\n\nPlease check connection string in appsettings.json and ensure SQL Server is running and accessible.",
+                                    "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+#endif
+                // --- End Connection Test ---
 
                 // --- Step 2: Manually Create ALL Dependencies ---
-                // Security
-                var passwordHasher = new PasswordHasher();
+                var passwordHasher = new PasswordHasher(); // Create once
 
-                // Repositories (All need connection string)
+                // Repositories
                 var userRepository = new UserRepository(connectionString);
                 var categoryRepository = new CategoryRepository(connectionString);
                 var eventRepository = new EventRepository(connectionString);
-                var archivedEventRepository = new ArchivedEventRepository(connectionString); // New
-                var reminderRepository = new ReminderRepository(connectionString);         // New
+                var archivedEventRepository = new ArchivedEventRepository(connectionString);
+                var reminderRepository = new ReminderRepository(connectionString);
 
-                // Services (Inject repositories)
+                // Services (Inject dependencies)
                 authService = new AuthService(userRepository, passwordHasher);
+                userService = new UserService(userRepository, passwordHasher); // Pass hasher here too
                 categoryService = new CategoryService(categoryRepository);
-                reminderService = new ReminderService(reminderRepository, eventRepository); // New (needs EventRepo too)
-                eventService = new EventService(                                         // Modified constructor
-                    eventRepository,
-                    categoryRepository,
-                    archivedEventRepository,
-                    reminderRepository // Inject ReminderRepository directly
+                reminderService = new ReminderService(reminderRepository, eventRepository);
+                eventService = new EventService(eventRepository, categoryRepository, archivedEventRepository, reminderRepository);
+
+
+                // --- Step 3: Application Loop (Login/Register/Main) ---
+                while (true)
+                {
+                    CurrentUser = null;
+                    DialogResult formResult = DialogResult.None;
+
+                    // Show Login Form
+                    using (var loginForm = new LoginForm(authService)) // Pass AuthService
+                    {
+                        formResult = loginForm.ShowDialog();
+
+                        if (formResult == DialogResult.OK)
+                        {
+                            CurrentUser = loginForm.LoggedInUser;
+                            if (CurrentUser != null) { break; } // Exit loop on success
+                            else { MessageBox.Show("Login error: User data unavailable.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+                        }
+                        else if (formResult == DialogResult.Retry) // Signal to Register
+                        {
+                            using (var registrationForm = new RegistrationForm(authService)) { registrationForm.ShowDialog(); }
+                            // Loop continues back to Login
+                        }
+                        else // User cancelled/closed Login
+                        {
+                            return; // Exit application
+                        }
+                    }
+                } // End while loop
+
+                // --- Step 4: Run Main Dashboard (only if login succeeded) ---
+                if (CurrentUser != null)
+                {
+                    // Ensure all services were created (defensive check)
+                    if (eventService == null || categoryService == null || reminderService == null || userService == null || authService == null)
+                    {
+                        throw new InvalidOperationException("One or more required services failed to initialize before launching main form.");
+                    }
+
+                    // Create and run the MainForm, passing all needed services
+                    MainForm mainDashboard = new MainForm(
+                        CurrentUser,
+                        eventService,
+                        categoryService,
+                        reminderService,
+                        authService,    // Needed for logout
+                        userService,    // Needed for account settings
+                        archivedEventRepository // Passed directly for archive view
                     );
 
-                // --- Step 3: Show Login Form Modally ---
-                bool loggedInSuccessfully = false;
-                using (var loginForm = new LoginForm(authService)) // Only needs AuthService
-                {
-                    DialogResult loginResult = loginForm.ShowDialog();
+                    Application.Run(mainDashboard); // Blocks until closed
 
-                    if (loginResult == DialogResult.OK)
+                    // --- Step 5: Handle Logout ---
+                    if (mainDashboard.DialogResult == DialogResult.Abort) // Logout signal
                     {
-                        CurrentUser = loginForm.LoggedInUser; // Get user from form property
-                        if (CurrentUser != null)
-                        {
-                            loggedInSuccessfully = true;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Login succeeded but user data could not be retrieved.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+                        Application.Restart();
+                        Environment.Exit(0);
                     }
-                    // else: User cancelled login, loggedInSuccessfully remains false
                 }
-
-                // --- Step 4: Run Main Form Only If Login Succeeded ---
-                if (loggedInSuccessfully && CurrentUser != null)
-                {
-                    // Ensure all required services were created successfully before running main form
-                    if (eventService == null || categoryService == null || reminderService == null)
-                    {
-                        throw new InvalidOperationException("One or more required services failed to initialize.");
-                    }
-
-                    // Run the main application form, passing the user and necessary services
-                    // MainForm constructor needs updating to accept these
-                    Application.Run(new MainForm(CurrentUser, eventService, categoryService, reminderService));
-                }
-                // else: If login failed or was cancelled, the application exits here.
-
             }
-            catch (InvalidOperationException configEx) // Catch critical config errors from DbHelper
+            catch (InvalidOperationException configEx) // Catch critical config/init errors
             {
-                Console.WriteLine($"CONFIGURATION ERROR: {configEx}");
-                MessageBox.Show($"Fatal Configuration Error:\n{configEx.Message}\n\nApplication cannot start. Please check 'appsettings.json'.",
-                                "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"CONFIGURATION/INIT ERROR: {configEx.InnerException?.Message ?? configEx.Message}"); // Show inner exception if available
+                MessageBox.Show($"Fatal Application Error:\n{configEx.Message}\n\nApplication cannot start.",
+                                "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            catch (ApplicationException appEx) // Catch potential connection/DB errors during startup/service creation
+            catch (ApplicationException appEx) // Catch startup DB errors etc.
             {
-                Console.WriteLine($"STARTUP APPLICATION ERROR: {appEx}");
-                MessageBox.Show($"A critical application error occurred during startup:\n{appEx.Message}\n\nPlease contact support.",
+                Console.WriteLine($"STARTUP APPLICATION ERROR: {appEx.InnerException?.Message ?? appEx.Message}");
+                MessageBox.Show($"A critical application error occurred during startup:\n{appEx.Message}",
                                 "Startup Error", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
-            catch (Exception ex) // Catch any other unexpected startup errors
+            catch (Exception ex) // Catch all other unexpected startup errors
             {
                 Console.WriteLine($"UNEXPECTED STARTUP ERROR: {ex}");
                 MessageBox.Show($"An unexpected error occurred during application startup:\n{ex.Message}",

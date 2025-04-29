@@ -1,3 +1,4 @@
+using MaterialSkin;
 using MaterialSkin.Controls;
 using Microsoft.Data.SqlClient;
 using reLIFE.BusinessLogic.Data;
@@ -22,6 +23,27 @@ namespace reLIFE.WinFormsUI
         {
             InitializeComponent();
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+            var materialSkinManager = MaterialSkinManager.Instance;
+            materialSkinManager.AddFormToManage(this);
+            materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500,
+                Accent.Red200, TextShade.WHITE);
+            //materialLabel1.ForeColor = Color.White;
+            //materialLabel1.HighEmphasis = true;
+            //materialLabel1.UseAccent = true;
+            //materialLabel1.Enabled = true
+            materialLabel1.AutoSize = false;
+            materialLabel1.Size = new Size(127, 25);
+            materialLabel1.FontType = MaterialSkinManager.fontType.H6;
+            materialLabel2.AutoSize = false;
+            materialLabel2.Size = new Size(127, 25);
+            materialLabel2.FontType = MaterialSkinManager.fontType.H6;
+            lblError.AutoSize = false;
+            lblError.Size = new Size(323, 72);
+            lblError.FontType = MaterialSkinManager.fontType.Body2;
+            lblError.HighEmphasis = true;
+            lblError.UseAccent = true;
+            lblError.Enabled = true;
         }
 
         private void LoginForm_Load(object sender, EventArgs e)

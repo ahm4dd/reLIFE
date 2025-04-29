@@ -1,6 +1,6 @@
 ﻿namespace reLIFE.WinFormsUI.Forms
 {
-    partial class MainForm
+    partial class EventForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,19 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SuspendLayout();
-            // 
-            // MainForm
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1097, 575);
-            FormStyle = FormStyles.ActionBar_None;
-            Name = "MainForm";
-            Padding = new Padding(3, 24, 3, 3);
-            Text = "MainForm";
-            Load += MainForm_Load;
-            ResumeLayout(false);
+            this.components = new System.ComponentModel.Container();
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Text = "EventForm";
         }
 
         #endregion

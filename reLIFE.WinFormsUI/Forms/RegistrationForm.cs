@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MaterialSkin;
 using MaterialSkin.Controls;
 using reLIFE.BusinessLogic.Services;
 using reLIFE.BusinessLogic.Validators;
@@ -21,6 +22,31 @@ namespace reLIFE.WinFormsUI.Forms
         {
             InitializeComponent();
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+            var materialSkinManager = MaterialSkinManager.Instance;
+            materialSkinManager.AddFormToManage(this);
+            materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500,
+                Accent.Red200, TextShade.WHITE);
+
+            materialLabel1.AutoSize = false;
+            materialLabel1.Size = new Size(127, 25);
+            materialLabel1.FontType = MaterialSkinManager.fontType.H6;
+            materialLabel2.AutoSize = false;
+            materialLabel2.Size = new Size(127, 25);
+            materialLabel2.FontType = MaterialSkinManager.fontType.H6;
+            materialLabel3.AutoSize = false;
+            materialLabel3.Size = new Size(127, 25);
+            materialLabel3.FontType = MaterialSkinManager.fontType.H6;
+            materialLabel4.AutoSize = false;
+            materialLabel4.Size = new Size(300, 25);
+            materialLabel4.FontType = MaterialSkinManager.fontType.H6;
+            
+            lblErrorReg.AutoSize = false;
+            lblErrorReg.Size = new Size(323, 72);
+            lblErrorReg.FontType = MaterialSkinManager.fontType.Body2;
+            lblErrorReg.HighEmphasis = true;
+            lblErrorReg.UseAccent = true;
+            lblErrorReg.Enabled = true;
         }
 
         // --- Event Handlers ---

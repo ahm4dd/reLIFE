@@ -28,66 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            GetStarted = new Label();
-            Username = new Label();
-            Password = new Label();
-            lblError = new Label();
             btnLogin = new MaterialSkin.Controls.MaterialButton();
             txtUsername = new MaterialSkin.Controls.MaterialTextBox2();
             lnkRegister = new MaterialSkin.Controls.MaterialButton();
             txtPassword = new MaterialSkin.Controls.MaterialTextBox2();
             boxShow = new MaterialSkin.Controls.MaterialCheckbox();
+            materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
+            materialLabel2 = new MaterialSkin.Controls.MaterialLabel();
+            lblError = new MaterialSkin.Controls.MaterialLabel();
             SuspendLayout();
-            // 
-            // GetStarted
-            // 
-            GetStarted.AutoSize = true;
-            GetStarted.BackColor = Color.Transparent;
-            GetStarted.FlatStyle = FlatStyle.Flat;
-            GetStarted.Font = new Font("Lucida Sans", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            GetStarted.ForeColor = Color.Black;
-            GetStarted.Location = new Point(102, 79);
-            GetStarted.Name = "GetStarted";
-            GetStarted.Size = new Size(143, 27);
-            GetStarted.TabIndex = 0;
-            GetStarted.Text = "Get Started";
-            // 
-            // Username
-            // 
-            Username.AutoSize = true;
-            Username.BackColor = Color.Transparent;
-            Username.FlatStyle = FlatStyle.Flat;
-            Username.Font = new Font("Lucida Sans", 12.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            Username.ForeColor = Color.Black;
-            Username.Location = new Point(30, 135);
-            Username.Name = "Username";
-            Username.Size = new Size(98, 19);
-            Username.TabIndex = 2;
-            Username.Text = "Username:";
-            // 
-            // Password
-            // 
-            Password.AutoSize = true;
-            Password.BackColor = Color.Transparent;
-            Password.FlatStyle = FlatStyle.Flat;
-            Password.Font = new Font("Lucida Sans", 12.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            Password.ForeColor = Color.Black;
-            Password.Location = new Point(30, 222);
-            Password.Name = "Password";
-            Password.Size = new Size(95, 19);
-            Password.TabIndex = 4;
-            Password.Text = "Password:";
-            // 
-            // lblError
-            // 
-            lblError.BackColor = Color.Transparent;
-            lblError.FlatStyle = FlatStyle.Flat;
-            lblError.Font = new Font("Segoe UI Semibold", 7.75F, FontStyle.Bold);
-            lblError.ForeColor = Color.IndianRed;
-            lblError.Location = new Point(30, 337);
-            lblError.Name = "lblError";
-            lblError.Size = new Size(283, 54);
-            lblError.TabIndex = 7;
             // 
             // btnLogin
             // 
@@ -96,7 +45,7 @@
             btnLogin.Depth = 0;
             btnLogin.HighEmphasis = true;
             btnLogin.Icon = null;
-            btnLogin.Location = new Point(249, 397);
+            btnLogin.Location = new Point(247, 392);
             btnLogin.Margin = new Padding(4, 6, 4, 6);
             btnLogin.MouseState = MaterialSkin.MouseState.HOVER;
             btnLogin.Name = "btnLogin";
@@ -119,7 +68,7 @@
             txtUsername.HideSelection = true;
             txtUsername.Hint = "Enter username (E.g. ahm4dd)";
             txtUsername.LeadingIcon = null;
-            txtUsername.Location = new Point(30, 157);
+            txtUsername.Location = new Point(28, 117);
             txtUsername.MaxLength = 32767;
             txtUsername.MouseState = MaterialSkin.MouseState.OUT;
             txtUsername.Name = "txtUsername";
@@ -141,13 +90,13 @@
             // lnkRegister
             // 
             lnkRegister.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            lnkRegister.BackColor = Color.SpringGreen;
+            lnkRegister.BackColor = Color.Red;
             lnkRegister.BackgroundImageLayout = ImageLayout.None;
             lnkRegister.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
             lnkRegister.Depth = 0;
             lnkRegister.HighEmphasis = true;
             lnkRegister.Icon = null;
-            lnkRegister.Location = new Point(30, 397);
+            lnkRegister.Location = new Point(28, 392);
             lnkRegister.Margin = new Padding(4, 6, 4, 6);
             lnkRegister.MouseState = MaterialSkin.MouseState.HOVER;
             lnkRegister.Name = "lnkRegister";
@@ -170,7 +119,7 @@
             txtPassword.HideSelection = true;
             txtPassword.Hint = "Enter password (E.g. securePass1)";
             txtPassword.LeadingIcon = null;
-            txtPassword.Location = new Point(30, 249);
+            txtPassword.Location = new Point(28, 209);
             txtPassword.MaxLength = 32767;
             txtPassword.MouseState = MaterialSkin.MouseState.OUT;
             txtPassword.Name = "txtPassword";
@@ -195,7 +144,7 @@
             boxShow.AutoSize = true;
             boxShow.BackColor = Color.Transparent;
             boxShow.Depth = 0;
-            boxShow.Location = new Point(30, 300);
+            boxShow.Location = new Point(28, 269);
             boxShow.Margin = new Padding(0);
             boxShow.MouseLocation = new Point(-1, -1);
             boxShow.MouseState = MaterialSkin.MouseState.HOVER;
@@ -208,23 +157,59 @@
             boxShow.UseVisualStyleBackColor = false;
             boxShow.CheckedChanged += boxShow_CheckedChanged;
             // 
+            // materialLabel1
+            // 
+            materialLabel1.AutoSize = true;
+            materialLabel1.Depth = 0;
+            materialLabel1.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel1.Location = new Point(28, 179);
+            materialLabel1.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel1.Name = "materialLabel1";
+            materialLabel1.Size = new Size(75, 19);
+            materialLabel1.TabIndex = 13;
+            materialLabel1.Text = "Password:";
+            // 
+            // materialLabel2
+            // 
+            materialLabel2.AutoSize = true;
+            materialLabel2.Depth = 0;
+            materialLabel2.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel2.Location = new Point(28, 84);
+            materialLabel2.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel2.Name = "materialLabel2";
+            materialLabel2.Size = new Size(76, 19);
+            materialLabel2.TabIndex = 14;
+            materialLabel2.Text = "Username:";
+            // 
+            // lblError
+            // 
+            lblError.AutoSize = true;
+            lblError.Depth = 0;
+            lblError.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblError.Location = new Point(28, 316);
+            lblError.MouseState = MaterialSkin.MouseState.HOVER;
+            lblError.Name = "lblError";
+            lblError.Size = new Size(1, 0);
+            lblError.TabIndex = 15;
+            // 
             // LoginForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Menu;
-            ClientSize = new Size(336, 454);
+            ClientSize = new Size(336, 456);
+            Controls.Add(lblError);
+            Controls.Add(materialLabel2);
+            Controls.Add(materialLabel1);
             Controls.Add(boxShow);
             Controls.Add(txtPassword);
             Controls.Add(lnkRegister);
             Controls.Add(txtUsername);
             Controls.Add(btnLogin);
-            Controls.Add(lblError);
-            Controls.Add(Password);
-            Controls.Add(Username);
-            Controls.Add(GetStarted);
+            Font = new Font("Segoe UI", 9F);
             MaximizeBox = false;
             Name = "LoginForm";
+            Padding = new Padding(3, 48, 3, 3);
             Sizable = false;
             Text = "LoginForm";
             Load += LoginForm_Load;
@@ -233,15 +218,13 @@
         }
 
         #endregion
-
-        private Label GetStarted;
-        private Label Username;
-        private Label Password;
-        private Label lblError;
         private MaterialSkin.Controls.MaterialButton btnLogin;
         private MaterialSkin.Controls.MaterialTextBox2 txtUsername;
         private MaterialSkin.Controls.MaterialButton lnkRegister;
         private MaterialSkin.Controls.MaterialTextBox2 txtPassword;
         private MaterialSkin.Controls.MaterialCheckbox boxShow;
+        private MaterialSkin.Controls.MaterialLabel materialLabel1;
+        private MaterialSkin.Controls.MaterialLabel materialLabel2;
+        private MaterialSkin.Controls.MaterialLabel lblError;
     }
 }

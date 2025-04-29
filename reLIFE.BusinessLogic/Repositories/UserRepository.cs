@@ -180,6 +180,147 @@ namespace reLIFE.BusinessLogic.Repositories
             }
         }
 
+        /// <summary>
+        /// Updates the email address for a specific user.
+        /// </summary>
+        /// <param name="userId">The ID of the user to update.</param>
+        /// <param name="newEmail">The new email address.</param>
+        /// <returns>True if the update was successful, false otherwise.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the new email violates the unique constraint.</exception>
+        /// <exception cref="ApplicationException">Thrown for general database errors.</exception>
+        public bool UpdateUserEmail(int userId, string newEmail)
+        {
+            const string sql = @"
+        UPDATE Users
+        SET Email = @NewEmail
+        WHERE Id = @UserId;";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@NewEmail", newEmail);
+                    command.Parameters.AddWithValue("@UserId", userId);
+
+                    connection.Open();
+                    int rowsAffected = command.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Check for unique constraint violation on Email
+                if (ex.Number == 2627 || ex.Number == 2601)
+                {
+                    throw new InvalidOperationException($"The email address '{newEmail}' is already in use.", ex);
+                }
+                Console.WriteLine($"SQL Error updating user email: {ex.Message}");
+                throw new ApplicationException($"A database error occurred while updating email for user ID {userId}.", ex);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error updating user email: {ex.Message}");
+                throw new ApplicationException($"An unexpected error occurred while updating email for user ID {userId}.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Updates the password hash and salt for a specific user.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose password to update.</param>
+        /// <param name="newHash">The new password hash (hex string).</param>
+        /// <param name="newSalt">The new password salt (hex string).</param>
+        /// <returns>True if the update was successful, false otherwise.</returns>
+        /// <exception cref="ApplicationException">Thrown for general database errors.</exception>
+        public bool UpdatePassword(int userId, string newHash, string newSalt)
+        {
+            // Validate inputs (basic length check based on DB schema)
+            if (string.IsNullOrEmpty(newHash) || newHash.Length > 64) // Max length from schema
+                throw new ArgumentException("Invalid new password hash provided.", nameof(newHash));
+            if (string.IsNullOrEmpty(newSalt) || newSalt.Length > 32) // Max length from schema
+                throw new ArgumentException("Invalid new password salt provided.", nameof(newSalt));
+
+            const string sql = @"
+        UPDATE Users
+        SET PasswordHash = @NewHash,
+            PasswordSalt = @NewSalt
+        WHERE Id = @UserId;";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@NewHash", newHash);
+                    command.Parameters.AddWithValue("@NewSalt", newSalt);
+                    command.Parameters.AddWithValue("@UserId", userId);
+
+                    connection.Open();
+                    int rowsAffected = command.ExecuteNonQuery();
+                    return rowsAffected > 0; // Return true if the user was found and updated
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"SQL Error updating password for user {userId}: {ex.Message}");
+                throw new ApplicationException($"A database error occurred while updating the password for user ID {userId}.", ex);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error updating password for user {userId}: {ex.Message}");
+                throw new ApplicationException($"An unexpected error occurred while updating the password for user ID {userId}.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a user by their unique ID.
+        /// </summary>
+        /// <param name="userId">The ID of the user to retrieve.</param>
+        /// <returns>The User object if found; otherwise, null.</returns>
+        /// <exception cref="ApplicationException">Thrown for general database errors.</exception>
+        public User? GetUserById(int userId)
+        {
+            if (userId <= 0) return null; // Invalid ID
+
+            const string sql = @"
+        SELECT Id, Username, Email, PasswordHash, PasswordSalt, CreatedAt
+        FROM Users
+        WHERE Id = @UserId;";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@UserId", userId);
+
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read()) // Check if a row was returned
+                        {
+                            // Use existing helper to map data
+                            return MapReaderToUser(reader);
+                        }
+                        else
+                        {
+                            return null; // User not found
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"SQL Error getting user by ID {userId}: {ex.Message}");
+                throw new ApplicationException($"An error occurred while retrieving user data for ID {userId}.", ex);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error getting user by ID {userId}: {ex.Message}");
+                throw new ApplicationException($"An unexpected error occurred while retrieving user data for ID {userId}.", ex);
+            }
+        }
 
         /// <summary>
         /// Helper method to map a SqlDataReader row to a User object.
