@@ -152,9 +152,10 @@ namespace reLIFE.WinFormsUI.Forms
         private void BoxShowPasswords_CheckedChanged(object? sender, EventArgs e)
         {
             bool show = boxShowPasswords.Checked;
-            txtCurrentPassword.PasswordChar = '\0';
-            txtNewPassword.PasswordChar = '\0';
-            txtConfirmPassword.PasswordChar = '\0';
+            txtCurrentPassword.PasswordChar = boxShowPasswords.Checked ? '\0' : '*';
+            txtNewPassword.PasswordChar = boxShowPasswords.Checked ? '\0' : '*';
+            txtConfirmPassword.PasswordChar = boxShowPasswords.Checked ? '\0' : '*';
+
         }
 
         private void ThemeOrSchemeChanged(object? sender, EventArgs e)
