@@ -26,8 +26,13 @@ namespace reLIFE.WinFormsUI
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
             materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
-            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500,
-                Accent.Red200, TextShade.WHITE);
+            materialSkinManager.ColorScheme = new ColorScheme(
+    Primary.Indigo800,
+    Primary.Indigo900,
+    Primary.Indigo500,
+    Accent.Red200, // Light Blue accent provides nice contrast
+    TextShade.WHITE
+);
             //materialLabel1.ForeColor = Color.White;
             //materialLabel1.HighEmphasis = true;
             //materialLabel1.UseAccent = true;
@@ -183,7 +188,7 @@ namespace reLIFE.WinFormsUI
 
         private void boxShow_CheckedChanged(object sender, EventArgs e)
         {
-            txtPassword.PasswordChar = boxShow.Checked ? '\0' : '*';
+            txtPassword.PasswordChar = boxShow.Checked ? '\0' : '*';    
         }
 
         private void SetActiveControl(Control control)
