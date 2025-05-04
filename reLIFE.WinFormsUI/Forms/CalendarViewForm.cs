@@ -34,34 +34,28 @@ namespace reLIFE.WinFormsUI.Forms
         {
             InitializeComponent();
 
+            // Form settings (as set by LoadControl, but good practice)
             this.TopLevel = false;
             this.FormBorderStyle = FormBorderStyle.None;
-            this.Dock = DockStyle.Fill;
+            this.Dock = DockStyle.Fill;     // Form fills its container (pnlContent)
+            this.AutoScroll = false;        // Form does NOT scroll
+            this.AutoSize = false;         // Form does NOT autosize
 
+            // --- REMOVED MaterialSkinManager.AddFormToManage(this); ---
+            // --- REMOVED local Theme/Scheme setting ---
+
+            // Store dependencies
             _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
             _eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _reminderService = reminderService ?? throw new ArgumentNullException(nameof(reminderService));
 
+            // Initial Setup
             dtpSelectedDate.Value = DateTime.Today;
             UpdateSelectedDateLabel();
 
-            var skinManager = MaterialSkin.MaterialSkinManager.Instance;
-            skinManager.AddFormToManage(this);
-            skinManager.Theme = MaterialSkinManager.Themes.DARK;
-            skinManager.ColorScheme = new ColorScheme(
-    Primary.Indigo800,
-    Primary.Indigo900,
-    Primary.Indigo500,
-    Accent.Red200, // Light Blue accent provides nice contrast
-    TextShade.WHITE
-);
-
-            // Use ItemCheck event if available and reliable for immediate feedback
-            // Otherwise, rely solely on btnApplyFilters_Click
-            // this.clbCategoryFilter.ItemCheck += clbCategoryFilter_ItemCheck; // Hook if using immediate filter
-            if (this.btnApplyFilters != null) // Hook Apply button
-                this.btnApplyFilters.Click += btnApplyFilters_Click;
+            // Hook Apply button if it exists
+            if (this.btnApplyFilters != null) this.btnApplyFilters.Click += btnApplyFilters_Click;
         }
 
         // --- Control Load ---
@@ -246,15 +240,14 @@ namespace reLIFE.WinFormsUI.Forms
         // --- Event Card Creation (No change needed here) ---
         private MaterialCard CreateEventMaterialCard(Event evt)
         { /* ... Same as before ... */
-            Color customCardColor = Color.FromArgb(75, 75, 75);
             MaterialCard card = new MaterialCard
             {
                 Width = flpEvents.Width - 30,
                 Margin = new Padding(10),
                 Padding = new Padding(5),
                 Tag = evt,
-                AutoSize = true,
-                BackColor = customCardColor // *** SET THE BACKCOLOR HERE ***
+                AutoSize = true
+                // REMOVED -> BackColor = customCardColor
             }; TableLayoutPanel layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1, AutoSize = true, ColumnStyles = { new ColumnStyle(SizeType.Absolute, 8), new ColumnStyle(SizeType.Percent, 100F), new ColumnStyle(SizeType.Absolute, 85) } };
             card.Controls.Add(layout);
             Panel colorStripe = new Panel { Dock = DockStyle.Fill, Margin = new Padding(0) };
@@ -288,13 +281,19 @@ namespace reLIFE.WinFormsUI.Forms
         // *** MODIFIED: OpenEventForm - Resets filters before refresh ***
         private void OpenEventForm(Event? eventToEdit)
         {
+            // Get the global instance
+            var skinManager = MaterialSkinManager.Instance;
+
             using (var eventForm = new EventForm(_currentUser, _eventService, _categoryService, _reminderService, eventToEdit))
             {
-                if (eventForm.ShowDialog() == DialogResult.OK)
+                skinManager.AddFormToManage(eventForm); // *** ADD Before ShowDialog ***
+                DialogResult result = eventForm.ShowDialog(); // Show modally
+                skinManager.RemoveFormToManage(eventForm); // *** REMOVE After Close ***
+
+                if (result == DialogResult.OK)
                 {
-                    // *** FIX: Ensure filters allow the new/edited event to be seen ***
-                    CheckAllCategoryFilters(true); // Check all filters
-                    LoadAndDisplayEvents();      // Then reload and display
+                    CheckAllCategoryFilters(true);
+                    LoadAndDisplayEvents();
                 }
             }
         }

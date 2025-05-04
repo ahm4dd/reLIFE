@@ -39,34 +39,25 @@ namespace reLIFE.WinFormsUI.Forms
         {
             InitializeComponent();
 
+            // --- REMOVED MaterialSkinManager Add/Theme/Scheme ---
+
             // Store dependencies
             _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+            // ... store other services ...
             _eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _reminderService = reminderService ?? throw new ArgumentNullException(nameof(reminderService));
             _eventToEdit = eventToEdit;
 
-            // Initialize MaterialSkin
-            var skinManager = MaterialSkin.MaterialSkinManager.Instance;
-            skinManager.AddFormToManage(this);
-            skinManager.Theme = MaterialSkinManager.Themes.DARK;
-            skinManager.ColorScheme = new ColorScheme(
-    Primary.Indigo800,
-    Primary.Indigo900,
-    Primary.Indigo500,
-    Accent.Red200, // Light Blue accent provides nice contrast
-    TextShade.WHITE
-);
+            // ... rest of constructor (SetupCategoryComboBox, ToggleReminderControls) ...
+            SetupCategoryComboBox();
+            ToggleReminderControls(false);
             lblError.AutoSize = false;
             //lblError.Size = new Size(323, 72);
             lblError.FontType = MaterialSkinManager.fontType.Body2;
             lblError.HighEmphasis = true;
             lblError.UseAccent = true;
             lblError.Enabled = true;
-
-            // Initial setup
-            SetupCategoryComboBox();
-            ToggleReminderControls(false); // Disable reminder controls initially
         }
 
         // --- Form Load ---

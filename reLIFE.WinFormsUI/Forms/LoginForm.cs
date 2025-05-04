@@ -19,6 +19,8 @@ namespace reLIFE.WinFormsUI
 
         // Property to hold the logged-in user
         public User? LoggedInUser { get; private set; }
+        public static User? LastLoggedInUser { get; private set; }
+
         public LoginForm(AuthService authService)
         {
             InitializeComponent();
@@ -92,6 +94,7 @@ namespace reLIFE.WinFormsUI
                 {
                     // --- Login Successful ---
                     this.LoggedInUser = user;           // Store the user in the public property
+                    LastLoggedInUser = user;
                     this.DialogResult = DialogResult.OK; // Signal success to Program.cs
                     // The form will close automatically because DialogResult is set
                 }

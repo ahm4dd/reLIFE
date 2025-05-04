@@ -35,8 +35,15 @@ namespace reLIFE.WinFormsUI.Forms
         {
             InitializeComponent();
 
+            // *** ADD FORM TO MANAGER HERE (Only Once) ***
+            MaterialSkinManager.Instance.AddFormToManage(this);
+
+            // *** Parent Panel DOES NOT SCROLL ***
+            pnlContent.AutoScroll = false;
+
             // Store dependencies
             _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+            // ... (store other dependencies) ...
             _eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _reminderService = reminderService ?? throw new ArgumentNullException(nameof(reminderService));
@@ -44,33 +51,21 @@ namespace reLIFE.WinFormsUI.Forms
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _archivedEventRepository = archivedEventRepository ?? throw new ArgumentNullException(nameof(archivedEventRepository));
 
-            // Initial setup
-            var materialSkinManager = MaterialSkinManager.Instance;
-            materialSkinManager.AddFormToManage(this);
-            materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
-            materialSkinManager.ColorScheme = new ColorScheme(
-    Primary.Indigo800,
-    Primary.Indigo900,
-    Primary.Indigo500,
-    Accent.Red200, // Light Blue accent provides nice contrast
-    TextShade.WHITE
-);
 
+            // --- Remove button AutoSize overrides if not needed ---
             dashboardPanel.BackColor = Color.FromArgb(64, 64, 64);
-
             pictureBox1.BackColor = Color.Transparent;
-
             btnAccountSettings.AutoSize = false;
             btnCalendarView.AutoSize = false;
             btnLogout.AutoSize = false;
             btnViewArchive.AutoSize = false;
             btnViewReminders.AutoSize = false;
-
             btnAccountSettings.Size = new Size(158, 36);
             btnCalendarView.Size = new Size(158, 36);
             btnLogout.Size = new Size(158, 36);
             btnViewArchive.Size = new Size(158, 36);
             btnViewReminders.Size = new Size(158, 36);
+            // btnAccountSettings.AutoSize = false; // etc. - remove unless specific sizing needed
 
             UpdateWindowTitle();
         }
@@ -138,40 +133,45 @@ namespace reLIFE.WinFormsUI.Forms
         /// Handles disposing of the previous control if necessary.
         /// </summary>
         /// <param name="controlToLoad">The UserControl instance to load.</param>
-        private void LoadControl(Form formToLoad) // Changed parameter type to Form
+        // Inside MainForm.cs
+        // Inside MainForm.cs
+        private void LoadControl(Form formToLoad)
         {
             if (pnlContent == null) return;
-
             this.Cursor = Cursors.WaitCursor;
+            pnlContent.SuspendLayout(); // Suspend panel layout
 
-            // Dispose previous control(s)
-            if (pnlContent.Controls.Count > 0)
-            {
-                var controlsToRemove = pnlContent.Controls.OfType<Control>().ToList();
-                foreach (var ctrl in controlsToRemove)
-                {
-                    pnlContent.Controls.Remove(ctrl);
-                    ctrl.Dispose();
-                }
-            }
+            // Dispose previous
+            if (pnlContent.Controls.Count > 0) { var cTR = pnlContent.Controls.OfType<Control>().ToList(); foreach (var c in cTR) { pnlContent.Controls.Remove(c); c.Dispose(); } }
             pnlContent.Controls.Clear();
+
+            // Reset panel scroll properties (belt and braces)
+            pnlContent.AutoScroll = false;
+            pnlContent.AutoScrollMinSize = Size.Empty;
+            pnlContent.AutoScrollPosition = Point.Empty;
+
 
             if (formToLoad != null)
             {
-                // *** Key changes for embedding a Form ***
-                formToLoad.TopLevel = false;             // Required
-                formToLoad.FormBorderStyle = FormBorderStyle.None; // No border needed
-                formToLoad.Dock = DockStyle.Fill;        // Fill the panel
-                                                         // *** End Key Changes ***
+                formToLoad.TopLevel = false;
+                formToLoad.FormBorderStyle = FormBorderStyle.None;
+                formToLoad.Dock = DockStyle.Fill; // *** FORM FILLS PANEL ***
+                formToLoad.AutoScroll = false;    // *** FORM DOES NOT SCROLL ***
+                formToLoad.AutoSize = false;     // *** FORM DOES NOT AUTOSIZE ***
 
-                pnlContent.Controls.Add(formToLoad);    // Add to panel
-                formToLoad.Show();                      // Show the form within the panel
-                formToLoad.BringToFront();              // Ensure it's visible
-                this.ActiveControl = formToLoad;         // Try to set focus
+                var skinManager = MaterialSkinManager.Instance;
+                skinManager.AddFormToManage((MaterialForm)formToLoad); // Manage theme
+
+                pnlContent.Controls.Add(formToLoad); // Add form to panel
+                formToLoad.Show();                   // Show the embedded form
+                formToLoad.BringToFront();
             }
 
+            pnlContent.ResumeLayout(true); // Resume panel layout
+            pnlContent.PerformLayout();
             this.Cursor = Cursors.Default;
         }
+
 
         /// <summary>
         /// Updates the main form's title bar.

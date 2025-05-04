@@ -1,3 +1,5 @@
+// File: reLIFE.WinFormsUI/Program.cs
+
 // Core .NET & WinForms
 using System;
 using System.Windows.Forms;
@@ -19,6 +21,7 @@ namespace reLIFE.WinFormsUI
     {
         /// <summary>
         /// Stores the currently logged-in user after successful authentication.
+        /// Uses a static property as a simple workaround for manual DI limitations.
         /// </summary>
         public static User? CurrentUser { get; private set; }
 
@@ -33,17 +36,10 @@ namespace reLIFE.WinFormsUI
             Application.SetCompatibleTextRenderingDefault(false);
 
             // *** Initialize MaterialSkinManager GLOBALLY ***
-            var skinManager = MaterialSkinManager.Instance;
-            // Set initial theme/scheme (e.g., load from settings or default)
-            // In a real app, load saved settings here:
-            // string savedTheme = Properties.Settings.Default.ThemeName ?? "Light";
-            // string savedScheme = Properties.Settings.Default.SchemeName ?? "Blue";
-            // ThemeHelper.ApplyTheme(
-            //     savedTheme == "Dark" ? MaterialSkinManager.Themes.DARK : MaterialSkinManager.Themes.LIGHT,
-            //     ThemeHelper.GetSchemeByName(savedScheme),
-            //     savedScheme
-            // );
-            // --- OR --- Set a hardcoded default for now:
+            var skinManager = MaterialSkinManager.Instance; // Get the singleton instance
+
+            // --- Step 1: Set Initial Theme using ThemeHelper ---
+            // Load saved theme/scheme here in a real app, or use defaults
             ThemeHelper.ApplyTheme(MaterialSkinManager.Themes.LIGHT, ThemeHelper.BlueScheme, "Blue");
 
 
@@ -56,15 +52,14 @@ namespace reLIFE.WinFormsUI
             string connectionString = string.Empty;
             ArchivedEventRepository? archivedEventRepository = null; // Declare repo needed by MainForm
 
-
             try
             {
-                // --- Step 1: Get Connection String ---
+                // --- Step 2: Get Connection String ---
                 connectionString = DbHelper.GetConnectionString();
                 Console.WriteLine($"Loaded Connection String: [Length={connectionString.Length}]");
 
-                // --- Optional Step 1.5: Test Connection ---
-#if DEBUG
+                // --- Optional Step 2.5: Test Connection ---
+#if DEBUG // Only run this test in Debug builds
                 try
                 {
                     Console.WriteLine("Attempting database connection test...");
@@ -81,7 +76,7 @@ namespace reLIFE.WinFormsUI
 #endif
                 // --- End Connection Test ---
 
-                // --- Step 2: Manually Create ALL Dependencies ---
+                // --- Step 3: Manually Create ALL Dependencies ---
                 var passwordHasher = new PasswordHasher();
 
                 // Repositories
@@ -99,7 +94,7 @@ namespace reLIFE.WinFormsUI
                 eventService = new EventService(eventRepository, categoryRepository, archivedEventRepository, reminderRepository);
 
 
-                // --- Step 3: Application Loop (Login/Register/Main) ---
+                // --- Step 4: Application Loop (Login/Register/Main) ---
                 while (true) // Loop until Application.Exit or fatal error
                 {
                     CurrentUser = null; // Reset user for this login attempt
@@ -109,16 +104,25 @@ namespace reLIFE.WinFormsUI
                     using (var loginForm = new LoginForm(authService))
                     {
                         // Add Login Form to Manager *before* showing
-                        // Note: Individual forms should NOT call AddFormToManage in their constructors anymore
+                        // Individual forms should NOT call AddFormToManage in their constructors
                         skinManager.AddFormToManage(loginForm); // Manage the login form appearance
                         formResult = loginForm.ShowDialog();
                         skinManager.RemoveFormToManage(loginForm); // Clean up manager reference after close
 
                         if (formResult == DialogResult.OK)
                         {
-                            CurrentUser = loginForm.LoggedInUser;
-                            if (CurrentUser != null) { break; } // Exit Login loop, proceed to Main Form
-                            else { MessageBox.Show("Login error: User data unavailable.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+                            // Retrieve user from the static property set by LoginForm
+                            CurrentUser = LoginForm.LastLoggedInUser;
+                            if (CurrentUser != null)
+                            {
+                                break; // Exit Login loop, proceed to Main Form
+                            }
+                            else
+                            {
+                                // This case indicates a problem if OK was returned but user is null
+                                MessageBox.Show("Login error: User data unavailable after login.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return; // Exit app on inconsistent state
+                            }
                         }
                         else if (formResult == DialogResult.Retry) // Signal from LoginForm to Register
                         {
@@ -130,15 +134,15 @@ namespace reLIFE.WinFormsUI
                                 // Loop continues back to Login Form after registration closes
                             }
                         }
-                        else // User cancelled or closed Login Form
+                        else // User cancelled or closed Login Form (DialogResult.Cancel or other)
                         {
                             return; // Exit application
                         }
-                    }
+                    } // using LoginForm
                 } // End while loop (exits only on successful login)
 
 
-                // --- Step 4: Run Main Dashboard (only if login succeeded) ---
+                // --- Step 5: Run Main Dashboard (only if login succeeded) ---
                 if (CurrentUser != null)
                 {
                     // Ensure all services needed by MainForm were created
@@ -153,26 +157,24 @@ namespace reLIFE.WinFormsUI
                         eventService,
                         categoryService,
                         reminderService,
-                        authService,    // Pass for logout/password change
+                        authService,    // Pass for logout
                         userService,    // Pass for account settings
                         archivedEventRepository // Pass repo directly for archive view simplicity
                     );
 
-                    // Add MainForm to manager *before* running
-                    skinManager.AddFormToManage(mainDashboard);
+                    // MainForm constructor should call skinManager.AddFormToManage(this);
 
-                    Application.Run(mainDashboard); // Blocks here until mainDashboard closes
+                    Application.Run(mainDashboard); // Run the main message loop, blocks until mainDashboard closes
 
-                    // Clean up manager reference (optional but good practice)
-                    skinManager.RemoveFormToManage(mainDashboard);
-
-                    // --- Step 5: Handle Logout ---
+                    // --- Step 6: Handle Logout/Exit ---
+                    // This code runs *after* mainDashboard is closed
                     if (mainDashboard.DialogResult == DialogResult.Abort) // Our signal for logout
                     {
+                        // Restart the application to go back to login
                         Application.Restart();
-                        Environment.Exit(0); // Ensure current process exits cleanly after signalling restart
+                        Environment.Exit(0); // Ensure clean exit of current process
                     }
-                    // Otherwise (if closed normally), the application exits naturally after Application.Run finishes.
+                    // Otherwise (if closed normally via 'X' or Alt+F4), the application exits naturally.
                 }
             }
             catch (InvalidOperationException configEx) // Catch critical config/init errors

@@ -69,7 +69,7 @@
             materialCard1.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard1.Name = "materialCard1";
             materialCard1.Padding = new Padding(14);
-            materialCard1.Size = new Size(736, 100);
+            materialCard1.Size = new Size(724, 100);
             materialCard1.TabIndex = 0;
             // 
             // btnClose
@@ -129,7 +129,7 @@
             materialCard3.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard3.Name = "materialCard3";
             materialCard3.Padding = new Padding(14);
-            materialCard3.Size = new Size(736, 156);
+            materialCard3.Size = new Size(724, 156);
             materialCard3.TabIndex = 3;
             // 
             // btnUpdateEmail
@@ -215,7 +215,7 @@
             materialCard2.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard2.Name = "materialCard2";
             materialCard2.Padding = new Padding(14);
-            materialCard2.Size = new Size(736, 313);
+            materialCard2.Size = new Size(724, 313);
             materialCard2.TabIndex = 4;
             // 
             // lblError
@@ -456,24 +456,29 @@
             // 
             // flpAccountContent
             // 
+            flpAccountContent.AutoScroll = true;
             flpAccountContent.Controls.Add(materialCard1);
             flpAccountContent.Controls.Add(materialCard3);
             flpAccountContent.Controls.Add(materialCard2);
-            flpAccountContent.Location = new Point(6, 16);
+            flpAccountContent.Location = new Point(3, 0);
             flpAccountContent.Name = "flpAccountContent";
-            flpAccountContent.Size = new Size(760, 653);
+            flpAccountContent.Size = new Size(796, 507);
             flpAccountContent.TabIndex = 10;
             // 
             // AccountSettingsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(788, 675);
+            AutoScroll = true;
+            AutoSize = true;
+            ClientSize = new Size(802, 532);
             Controls.Add(flpAccountContent);
             FormStyle = FormStyles.StatusAndActionBar_None;
             Name = "AccountSettingsForm";
             Padding = new Padding(3, 0, 3, 3);
+            Sizable = false;
             Text = "AccountSettingsForm";
+            WindowState = FormWindowState.Maximized;
             Load += AccountSettingsForm_Load;
             materialCard1.ResumeLayout(false);
             materialCard1.PerformLayout();

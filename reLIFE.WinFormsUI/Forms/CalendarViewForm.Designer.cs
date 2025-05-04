@@ -32,8 +32,8 @@
             flpEvents = new FlowLayoutPanel();
             lblSelectedDateInfo = new MaterialSkin.Controls.MaterialLabel();
             clbCategoryFilter = new MaterialSkin.Controls.MaterialCheckedListBox();
-            btnAddEvent = new MaterialSkin.Controls.MaterialButton();
             btnApplyFilters = new MaterialSkin.Controls.MaterialButton();
+            btnAddEvent = new MaterialSkin.Controls.MaterialButton();
             clbCategoryFilter.SuspendLayout();
             SuspendLayout();
             // 
@@ -50,7 +50,7 @@
             flpEvents.AutoScroll = true;
             flpEvents.Location = new Point(377, 75);
             flpEvents.Name = "flpEvents";
-            flpEvents.Size = new Size(407, 388);
+            flpEvents.Size = new Size(393, 388);
             flpEvents.TabIndex = 1;
             // 
             // lblSelectedDateInfo
@@ -79,26 +79,6 @@
             clbCategoryFilter.StripeDarkColor = Color.Empty;
             clbCategoryFilter.TabIndex = 3;
             // 
-            // btnAddEvent
-            // 
-            btnAddEvent.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnAddEvent.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnAddEvent.Depth = 0;
-            btnAddEvent.HighEmphasis = true;
-            btnAddEvent.Icon = null;
-            btnAddEvent.Location = new Point(684, 25);
-            btnAddEvent.Margin = new Padding(4, 6, 4, 6);
-            btnAddEvent.MouseState = MaterialSkin.MouseState.HOVER;
-            btnAddEvent.Name = "btnAddEvent";
-            btnAddEvent.NoAccentTextColor = Color.Empty;
-            btnAddEvent.Size = new Size(100, 36);
-            btnAddEvent.TabIndex = 0;
-            btnAddEvent.Text = "Add Event";
-            btnAddEvent.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnAddEvent.UseAccentColor = false;
-            btnAddEvent.UseVisualStyleBackColor = true;
-            btnAddEvent.Click += btnAddEvent_Click;
-            // 
             // btnApplyFilters
             // 
             btnApplyFilters.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -106,7 +86,7 @@
             btnApplyFilters.Depth = 0;
             btnApplyFilters.HighEmphasis = true;
             btnApplyFilters.Icon = null;
-            btnApplyFilters.Location = new Point(4, 346);
+            btnApplyFilters.Location = new Point(14, 337);
             btnApplyFilters.Margin = new Padding(4, 6, 4, 6);
             btnApplyFilters.MouseState = MaterialSkin.MouseState.HOVER;
             btnApplyFilters.Name = "btnApplyFilters";
@@ -119,10 +99,31 @@
             btnApplyFilters.UseVisualStyleBackColor = true;
             btnApplyFilters.Click += btnApplyFilters_Click;
             // 
+            // btnAddEvent
+            // 
+            btnAddEvent.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnAddEvent.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnAddEvent.Depth = 0;
+            btnAddEvent.HighEmphasis = true;
+            btnAddEvent.Icon = null;
+            btnAddEvent.Location = new Point(670, 25);
+            btnAddEvent.Margin = new Padding(4, 6, 4, 6);
+            btnAddEvent.MouseState = MaterialSkin.MouseState.HOVER;
+            btnAddEvent.Name = "btnAddEvent";
+            btnAddEvent.NoAccentTextColor = Color.Empty;
+            btnAddEvent.Size = new Size(100, 36);
+            btnAddEvent.TabIndex = 0;
+            btnAddEvent.Text = "Add Event";
+            btnAddEvent.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnAddEvent.UseAccentColor = false;
+            btnAddEvent.UseVisualStyleBackColor = true;
+            btnAddEvent.Click += btnAddEvent_Click;
+            // 
             // CalendarViewForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            AutoSize = true;
             ClientSize = new Size(800, 469);
             Controls.Add(clbCategoryFilter);
             Controls.Add(btnAddEvent);

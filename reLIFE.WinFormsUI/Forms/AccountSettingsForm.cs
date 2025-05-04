@@ -28,37 +28,22 @@ namespace reLIFE.WinFormsUI.Forms
         {
             InitializeComponent();
 
-            // Configure Form for Embedding
-            this.TopLevel = false;
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.Dock = DockStyle.Fill; // Form still fills pnlContent
 
-            // *** Enable Form's AutoScroll ***
-            this.AutoScroll = true;
-
+            // Store dependencies
             _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            // _authService = authService ?? throw new ArgumentNullException(nameof(authService));
 
-            // Initialize MaterialSkinManager for this form
-            var skinManager = MaterialSkinManager.Instance;
-            skinManager.AddFormToManage(this);
-
-            // Ensure password fields use password char initially
+            // Password fields init
             txtCurrentPassword.PasswordChar = '*';
             txtNewPassword.PasswordChar = '*';
             txtConfirmPassword.PasswordChar = '*';
-            txtEmail.Text = currentUser.Email.ToString();
-            lblUsernameValue.Text = currentUser.Username.ToString();
 
-            // Configure the FlowLayoutPanel (can also do in designer)
-            flpAccountContent.FlowDirection = FlowDirection.TopDown;
-            flpAccountContent.WrapContents = false;
-            flpAccountContent.AutoScroll = false; // FORM handles scrolling
-            flpAccountContent.AutoSize = true;    // Let it determine required height
-            flpAccountContent.AutoSizeMode = AutoSizeMode.GrowOnly;
-            flpAccountContent.Dock = DockStyle.Top; // Dock Top, let AutoSize control height
-            flpAccountContent.Padding = new Padding(10); // Add padding within FlowPanel
+            lblError.AutoSize = false;
+            //lblError.Size = new Size(323, 72);
+            lblError.FontType = MaterialSkinManager.fontType.Body2;
+            lblError.HighEmphasis = true;
+            lblError.UseAccent = true;
+            lblError.Enabled = true;
         }
 
         private void AccountSettingsForm_Load(object sender, EventArgs e)
