@@ -209,7 +209,6 @@
             Font = new Font("Segoe UI", 9F);
             MaximizeBox = false;
             Name = "LoginForm";
-            Padding = new Padding(3, 48, 3, 3);
             Sizable = false;
             Text = "LoginForm";
             Load += LoginForm_Load;
