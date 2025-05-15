@@ -1,4 +1,6 @@
-﻿namespace reLIFE.WinFormsUI.Forms
+﻿using reLIFE.WinFormsUI.CustomControls.RJControls;
+
+namespace reLIFE.WinFormsUI.Forms
 {
     partial class EventForm
     {
@@ -33,10 +35,10 @@
             materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
             materialLabel2 = new MaterialSkin.Controls.MaterialLabel();
             materialDivider1 = new MaterialSkin.Controls.MaterialDivider();
-            dtpStartDate = new DateTimePicker();
+            dtpStartDate = new RJDatePicker();
             materialLabel3 = new MaterialSkin.Controls.MaterialLabel();
             materialLabel4 = new MaterialSkin.Controls.MaterialLabel();
-            dtpEndDate = new DateTimePicker();
+            dtpEndDate = new RJDatePicker();
             chkAllDay = new MaterialSkin.Controls.MaterialCheckbox();
             materialDivider2 = new MaterialSkin.Controls.MaterialDivider();
             materialLabel5 = new MaterialSkin.Controls.MaterialLabel();
@@ -50,9 +52,9 @@
             btnSave = new MaterialSkin.Controls.MaterialButton();
             btnCancel = new MaterialSkin.Controls.MaterialButton();
             materialLabel6 = new MaterialSkin.Controls.MaterialLabel();
-            dtpStartTime = new DateTimePicker();
+            dtpStartTime = new RJDatePicker();
             materialLabel7 = new MaterialSkin.Controls.MaterialLabel();
-            dtpEndTime = new DateTimePicker();
+            dtpEndTime = new RJDatePicker();
             ((System.ComponentModel.ISupportInitialize)nudReminderMinutes).BeginInit();
             SuspendLayout();
             // 
@@ -414,7 +416,7 @@
             Name = "EventForm";
             Padding = new Padding(3, 24, 3, 3);
             Text = "EventForm";
-            Load += EventForm_Load_1;
+            Load += EventForm_Load;
             ((System.ComponentModel.ISupportInitialize)nudReminderMinutes).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -427,10 +429,10 @@
         private MaterialSkin.Controls.MaterialLabel materialLabel1;
         private MaterialSkin.Controls.MaterialLabel materialLabel2;
         private MaterialSkin.Controls.MaterialDivider materialDivider1;
-        private DateTimePicker dtpStartDate;
+        private RJDatePicker dtpStartDate;
         private MaterialSkin.Controls.MaterialLabel materialLabel3;
         private MaterialSkin.Controls.MaterialLabel materialLabel4;
-        private DateTimePicker dtpEndDate;
+        private RJDatePicker dtpEndDate;
         private MaterialSkin.Controls.MaterialCheckbox chkAllDay;
         private MaterialSkin.Controls.MaterialDivider materialDivider2;
         private MaterialSkin.Controls.MaterialLabel materialLabel5;
@@ -445,8 +447,8 @@
         private MaterialSkin.Controls.MaterialButton btnSave;
         private MaterialSkin.Controls.MaterialButton btnCancel;
         private MaterialSkin.Controls.MaterialLabel materialLabel6;
-        private DateTimePicker dtpStartTime;
+        private RJDatePicker dtpStartTime;
         private MaterialSkin.Controls.MaterialLabel materialLabel7;
-        private DateTimePicker dtpEndTime;
+        private RJDatePicker dtpEndTime;
     }
 }
