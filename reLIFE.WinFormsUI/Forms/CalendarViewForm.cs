@@ -147,66 +147,64 @@ namespace reLIFE.WinFormsUI.Forms
         {
             // 1. Get Selected Category Filter Criteria
             var selectedCategoryIds = new HashSet<int?>();
-            bool includeUncategorized = false;
+            bool includeUncategorized = false; // For events with CategoryId = null
 
-            // Iterate through the actual CheckBox controls in the listbox items
             foreach (var itemObject in clbCategoryFilter.Items)
             {
                 if (itemObject is MaterialCheckbox cbItem && cbItem.Checked)
                 {
-                    // Retrieve the ID stored in the Tag
                     if (cbItem.Tag is int categoryId)
                     {
                         selectedCategoryIds.Add(categoryId);
-                        Console.WriteLine($"Filter: Added Category ID {categoryId} ({cbItem.Text})"); // Debug output
+                        Console.WriteLine($"Filter: Added Category ID {categoryId} ({cbItem.Text})");
                     }
-                    else if (cbItem.Tag == null) // Check Tag for null (our uncategorized marker)
+                    else if (cbItem.Tag == null) // Assuming Tag == null marks your "(Uncategorized)" item
                     {
                         includeUncategorized = true;
-                        Console.WriteLine($"Filter: Including Uncategorized"); // Debug output
+                        Console.WriteLine($"Filter: Including Uncategorized");
                     }
                 }
             }
 
-            // Determine if *any* specific filter is active. If not, we show all.
-            bool specificFilterActive = selectedCategoryIds.Count > 0 || includeUncategorized;
-            Console.WriteLine($"Filter: Specific Filter Active = {specificFilterActive}"); // Debug output
+            // Determine if any specific filter is active.
+            bool anyCheckboxIsChecked = selectedCategoryIds.Count > 0 || includeUncategorized;
+            Console.WriteLine($"Filter: Any Checkbox Is Checked = {anyCheckboxIsChecked}");
 
-            // 2. Filter Events using a standard loop (easier to debug)
-            var filteredEvents = new List<Event>(); // Start with an empty list
+            // 2. Filter Events
+            var filteredEvents = new List<Event>();
+            Console.WriteLine($"Filter: Processing {_allEventsForRange.Count} events from range.");
 
-            Console.WriteLine($"Filter: Processing {_allEventsForRange.Count} events from range."); // Debug output
             foreach (Event evt in _allEventsForRange)
             {
                 bool includeThisEvent = false;
 
-                // Condition 1: If NO specific filters are active, include everything.
-                if (!specificFilterActive && clbCategoryFilter.Items.Count > 0) // Only show all if filters exist but none are checked
+                // Condition 1: If there are category filters available BUT NONE are checked by the user,
+                // then show ALL events (including those with categories and those without).
+                if (clbCategoryFilter.Items.Count > 0 && !anyCheckboxIsChecked)
                 {
-                    // By default, if no filters checked, maybe show nothing instead of all? Let's try showing nothing first.
-                    // includeThisEvent = true; // Uncomment this line if you want "no filters checked" = "show all"
+                    includeThisEvent = true; // SHOW ALL when no filters are actively selected
+                    Console.WriteLine($"Filter: Including Event ID {evt.Id} (Title: '{evt.Title}') because NO filters are checked.");
                 }
-                else if (!specificFilterActive && clbCategoryFilter.Items.Count == 0)
+                // Condition 2: If there are NO category filters defined AT ALL, show all events.
+                else if (clbCategoryFilter.Items.Count == 0)
                 {
-                    // If there are no categories AT ALL, show everything.
                     includeThisEvent = true;
+                    Console.WriteLine($"Filter: Including Event ID {evt.Id} (Title: '{evt.Title}') because NO category filters exist.");
                 }
+                // Condition 3: Specific filters ARE active, so apply them.
                 else
                 {
-                    // Condition 2: Check if the event's category matches a selected one.
                     if (evt.CategoryId != null && selectedCategoryIds.Contains(evt.CategoryId.Value))
                     {
                         includeThisEvent = true;
-                        Console.WriteLine($"Filter: Including Event ID {evt.Id} (Title: '{evt.Title}') due to Category ID {evt.CategoryId.Value}"); // Debug
+                        Console.WriteLine($"Filter: Including Event ID {evt.Id} (Title: '{evt.Title}') due to Category ID {evt.CategoryId.Value}");
                     }
-                    // Condition 3: Check if the event is uncategorized and we should include those.
                     else if (evt.CategoryId == null && includeUncategorized)
                     {
                         includeThisEvent = true;
-                        Console.WriteLine($"Filter: Including Event ID {evt.Id} (Title: '{evt.Title}') because it's Uncategorized."); // Debug
+                        Console.WriteLine($"Filter: Including Event ID {evt.Id} (Title: '{evt.Title}') because it's Uncategorized and filter is set.");
                     }
                 }
-
 
                 if (includeThisEvent)
                 {
@@ -214,13 +212,13 @@ namespace reLIFE.WinFormsUI.Forms
                 }
                 else
                 {
-                    Console.WriteLine($"Filter: EXCLUDING Event ID {evt.Id} (Title: '{evt.Title}', CategoryId: {evt.CategoryId?.ToString() ?? "NULL"})"); // Debug
+                    Console.WriteLine($"Filter: EXCLUDING Event ID {evt.Id} (Title: '{evt.Title}', CategoryId: {evt.CategoryId?.ToString() ?? "NULL"})");
                 }
             }
 
             // Order the results
             filteredEvents = filteredEvents.OrderBy(e => e.StartTime).ToList();
-            Console.WriteLine($"Filter: Found {filteredEvents.Count} events after filtering."); // Debug output
+            Console.WriteLine($"Filter: Found {filteredEvents.Count} events after filtering.");
 
             // 3. Populate FlowLayoutPanel (Same as before)
             flpEvents.SuspendLayout();
@@ -239,35 +237,61 @@ namespace reLIFE.WinFormsUI.Forms
         }
         // --- Event Card Creation (No change needed here) ---
         private MaterialCard CreateEventMaterialCard(Event evt)
-        { /* ... Same as before ... */
+        {
             MaterialCard card = new MaterialCard
             {
-                Width = flpEvents.Width - 30,
+                Width = flpEvents.Width - 30, // Adjust padding if needed
+                                              // UseAccentColor = false, // REMOVE - Card background comes from theme
                 Margin = new Padding(10),
                 Padding = new Padding(5),
                 Tag = evt,
                 AutoSize = true
-                // REMOVED -> BackColor = customCardColor
-            }; TableLayoutPanel layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1, AutoSize = true, ColumnStyles = { new ColumnStyle(SizeType.Absolute, 8), new ColumnStyle(SizeType.Percent, 100F), new ColumnStyle(SizeType.Absolute, 85) } };
-            card.Controls.Add(layout);
-            Panel colorStripe = new Panel { Dock = DockStyle.Fill, Margin = new Padding(0) };
-            Category? category = _userCategories.FirstOrDefault(c => c.Id == evt.CategoryId);
-            try { colorStripe.BackColor = (category != null && !string.IsNullOrEmpty(category.ColorHex)) ? ColorTranslator.FromHtml(category.ColorHex) : Color.Transparent; } catch { colorStripe.BackColor = Color.Gray; }
+            };
+            // ... (TableLayoutPanel, colorStripe setup remains the same) ...
+            TableLayoutPanel layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1, AutoSize = true, ColumnStyles = { new ColumnStyle(SizeType.Absolute, 8), new ColumnStyle(SizeType.Percent, 100F), new ColumnStyle(SizeType.Absolute, 95) } }; card.Controls.Add(layout); // Wider button col
+            Panel colorStripe = new Panel { Dock = DockStyle.Fill, Margin = new Padding(0) }; Category? category = _userCategories.FirstOrDefault(c => c.Id == evt.CategoryId); try { colorStripe.BackColor = (category != null && !string.IsNullOrEmpty(category.ColorHex)) ? ColorTranslator.FromHtml(category.ColorHex) : Color.Transparent; } catch { colorStripe.BackColor = Color.Gray; }
             layout.Controls.Add(colorStripe, 0, 0);
-            FlowLayoutPanel mainContentPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, AutoScroll = false, AutoSize = true, Padding = new Padding(5, 0, 0, 0) };
-            layout.Controls.Add(mainContentPanel, 1, 0);
-            MaterialLabel lblTitle = new MaterialLabel { Text = evt.Title, FontType = MaterialSkin.MaterialSkinManager.fontType.Subtitle1, HighEmphasis = true, AutoSize = true, MaximumSize = new Size(card.Width - 120, 0), Margin = new Padding(0, 0, 0, 3) }; mainContentPanel.Controls.Add(lblTitle);
-            lblTitle.HighEmphasis = true;
-            lblTitle.UseAccent = true;
-            lblTitle.Enabled = true;
+            FlowLayoutPanel mainContentPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, AutoScroll = false, AutoSize = true, Padding = new Padding(5, 0, 0, 0) }; layout.Controls.Add(mainContentPanel, 1, 0);
+
+
+            MaterialLabel lblTitle = new MaterialLabel
+            {
+                Text = evt.Title,
+                FontType = MaterialSkin.MaterialSkinManager.fontType.Subtitle1,
+                HighEmphasis = true, // Good for titles
+                AutoSize = true,
+                MaximumSize = new Size(card.Width - 130, 0), // Adjust based on button column width
+                UseAccent = true,
+                Margin = new Padding(0, 0, 0, 3),
+                // UseAccent = true, // ONLY if you specifically want title in accent color
+            };
+            mainContentPanel.Controls.Add(lblTitle);
+
+            // ... (lblTime, lblCategory, lblDesc remain the same, ensure fontType is lowercase) ...
             MaterialLabel lblTime = new MaterialLabel { Text = evt.IsAllDay ? "All Day" : $"{evt.StartTime:HH:mm} - {evt.EndTime:HH:mm}", FontType = MaterialSkin.MaterialSkinManager.fontType.Caption, Depth = 1, HighEmphasis = false, AutoSize = true, Margin = new Padding(0, 0, 0, 3) }; mainContentPanel.Controls.Add(lblTime);
-            MaterialLabel lblCategory = new MaterialLabel { Text = category?.Name ?? "Uncategorized", FontType = MaterialSkin.MaterialSkinManager.fontType.Caption, Depth = 1, HighEmphasis = false, AutoSize = true, Margin = new Padding(0, 0, 0, 5) }; if (category != null) lblCategory.ForeColor = colorStripe.BackColor; else lblCategory.ForeColor = Color.Gray; mainContentPanel.Controls.Add(lblCategory);
+            MaterialLabel lblCategoryText = new MaterialLabel { Text = category?.Name ?? "Uncategorized", FontType = MaterialSkin.MaterialSkinManager.fontType.Caption, Depth = 1, HighEmphasis = false, AutoSize = true, Margin = new Padding(0, 0, 0, 5) }; if (category != null) lblCategoryText.ForeColor = colorStripe.BackColor; else lblCategoryText.ForeColor = Color.Gray; mainContentPanel.Controls.Add(lblCategoryText); // Renamed to avoid conflict
             if (!string.IsNullOrWhiteSpace(evt.Description)) { MaterialLabel lblDesc = new MaterialLabel { Text = evt.Description.Length > 60 ? evt.Description.Substring(0, 60) + "..." : evt.Description, FontType = MaterialSkin.MaterialSkinManager.fontType.Body2, Depth = 2, HighEmphasis = false, AutoSize = true, MaximumSize = new Size(mainContentPanel.Width - 10, 0), Margin = new Padding(0, 0, 0, 3) }; mainContentPanel.Controls.Add(lblDesc); }
+
+
             FlowLayoutPanel buttonPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, Padding = new Padding(5, 0, 0, 0), Margin = new Padding(0), WrapContents = false, AutoSize = true };
             layout.Controls.Add(buttonPanel, 2, 0);
-            MaterialButton btnEdit = new MaterialButton { Text = "Edit", Tag = evt, Type = MaterialButton.MaterialButtonType.Text, UseAccentColor = true, Margin = new Padding(1), Height = 28, Width = 80 }; btnEdit.Click += CardButton_Click; buttonPanel.Controls.Add(btnEdit);
-            MaterialButton btnArchive = new MaterialButton { Text = "Archive", Tag = evt, Type = MaterialButton.MaterialButtonType.Text, UseAccentColor = false, Margin = new Padding(1), Height = 28, Width = 80 }; btnArchive.Click += CardButton_Click; buttonPanel.Controls.Add(btnArchive);
-            MaterialButton btnDelete = new MaterialButton { Text = "Delete", Tag = evt, Type = MaterialButton.MaterialButtonType.Text, UseAccentColor = false, Margin = new Padding(1), Height = 28, Width = 80 }; btnDelete.Click += CardButton_Click; buttonPanel.Controls.Add(btnDelete);
+
+            // Button styling: Rely on Type and global ColorScheme.
+            // Type = Text buttons often use accent color by default or can be styled via scheme.
+            MaterialButton btnEdit = new MaterialButton { Text = "Edit", Tag = evt, Type = MaterialButton.MaterialButtonType.Text, /* UseAccentColor=true is often default for Text type */ Margin = new Padding(1), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, MinimumSize = new Size(80, 28) };
+            btnEdit.UseAccentColor = true;
+            btnEdit.Click += CardButton_Click; buttonPanel.Controls.Add(btnEdit);
+
+            MaterialButton btnArchive = new MaterialButton { Text = "Archive", Tag = evt, Type = MaterialButton.MaterialButtonType.Text, Margin = new Padding(1), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, MinimumSize = new Size(80, 28) };
+            btnArchive.Click += CardButton_Click; buttonPanel.Controls.Add(btnArchive);
+
+            MaterialButton btnDelete = new MaterialButton { Text = "Delete", Tag = evt, Type = MaterialButton.MaterialButtonType.Text, Margin = new Padding(1), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, MinimumSize = new Size(80, 28) };
+            // For delete, you might want a more distinct (but still theme-aware) color if not using icons
+            // E.g., if your Accent is red: btnDelete.UseAccentColor = true;
+            // Or if you have a "Warning" color in your scheme (custom scheme):
+            // btnDelete.ForeColor = skinManager.ColorScheme.WarningColor; // Imaginary property
+            btnDelete.Click += CardButton_Click; buttonPanel.Controls.Add(btnDelete);
+
             return card;
         }
 
@@ -343,6 +367,11 @@ namespace reLIFE.WinFormsUI.Forms
                 }
             }
             _blockFilterEvent = false;
+        }
+
+        private void lblSelectedDateInfo_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

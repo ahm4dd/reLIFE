@@ -8,6 +8,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Assets\calendarDark.png" />
+    <None Remove="Assets\calendarWhite.png" />
+    <None Remove="Assets\reLIFEicon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\calendarDark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\calendarWhite.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\reLIFEicon.png" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\reLIFE.BusinessLogic\reLIFE.BusinessLogic.csproj" />
@@ -24,6 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Forms\AccountSettingsForm.Designer.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

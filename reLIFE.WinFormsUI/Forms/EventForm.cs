@@ -30,20 +30,20 @@ namespace reLIFE.WinFormsUI.Forms
 
         // --- Constructor ---
         public EventForm(
-            User currentUser,
-            EventService eventService,
-            CategoryService categoryService,
-            ReminderService reminderService,
-            Event? eventToEdit = null // Make event optional
-            )
+        User currentUser,
+        EventService eventService,
+        CategoryService categoryService,
+        ReminderService reminderService,
+        Event? eventToEdit = null
+        )
         {
             InitializeComponent();
 
-            // --- REMOVED MaterialSkinManager Add/Theme/Scheme ---
+            var skinManager = MaterialSkin.MaterialSkinManager.Instance;
+            skinManager.AddFormToManage(this);
 
             // Store dependencies
             _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
-            // ... store other services ...
             _eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _reminderService = reminderService ?? throw new ArgumentNullException(nameof(reminderService));
@@ -200,10 +200,22 @@ namespace reLIFE.WinFormsUI.Forms
                 txtDescription.Text = _eventToEdit.Description;
                 chkAllDay.Checked = _eventToEdit.IsAllDay;
 
+                // Set Date pickers first
                 dtpStartDate.Value = _eventToEdit.StartTime.Date;
-                dtpStartTime.Value = DateTime.MinValue.Add(_eventToEdit.StartTime.TimeOfDay); // Use MinValue as base date for time picker
-                dtpEndDate.Value = _eventToEdit.EndTime.Date;
-                dtpEndTime.Value = DateTime.MinValue.Add(_eventToEdit.IsAllDay ? TimeSpan.Zero : _eventToEdit.EndTime.TimeOfDay);
+                dtpEndDate.Value = _eventToEdit.EndTime.Date; // Set end date picker
+
+                // Set Time pickers using a valid base date (e.g., the selected start date or today)
+                // Ensure the date part is valid before adding TimeOfDay
+                DateTime baseDateForStartTime = dtpStartDate.Value.Date; // Use the selected start date
+                if (baseDateForStartTime < dtpStartTime.MinDate) baseDateForStartTime = dtpStartTime.MinDate;
+                if (baseDateForStartTime > dtpStartTime.MaxDate) baseDateForStartTime = dtpStartTime.MaxDate;
+                dtpStartTime.Value = baseDateForStartTime.Add(_eventToEdit.StartTime.TimeOfDay);
+
+                DateTime baseDateForEndTime = dtpEndDate.Value.Date; // Use the selected end date
+                if (baseDateForEndTime < dtpEndTime.MinDate) baseDateForEndTime = dtpEndTime.MinDate;
+                if (baseDateForEndTime > dtpEndTime.MaxDate) baseDateForEndTime = dtpEndTime.MaxDate;
+                dtpEndTime.Value = baseDateForEndTime.Add(_eventToEdit.IsAllDay ? TimeSpan.Zero : _eventToEdit.EndTime.TimeOfDay);
+
 
                 if (_eventToEdit.CategoryId.HasValue)
                 {
@@ -215,22 +227,34 @@ namespace reLIFE.WinFormsUI.Forms
             }
             else
             {
+                // --- ADD MODE ---
                 this.Text = "Add New Event";
                 DateTime now = DateTime.Now;
-                DateTime start = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0).AddHours(1);
-                DateTime end = start.AddHours(1);
+                // Default start time to the next hour, on the current date from dtpStartDate
+                DateTime defaultStartDate = dtpStartDate.Value.Date; // Get current date from picker
+                TimeSpan defaultStartTimeSpan = new TimeSpan(now.Hour + 1, 0, 0);
+                if (defaultStartTimeSpan.TotalHours >= 24)
+                { // Handle rolling over midnight
+                    defaultStartTimeSpan = new TimeSpan(0, 0, 0); // Start at midnight
+                    defaultStartDate = defaultStartDate.AddDays(1);
+                }
+                DateTime start = defaultStartDate.Add(defaultStartTimeSpan);
+                DateTime end = start.AddHours(1); // Default end time one hour after start
 
+                // Set Date pickers
                 dtpStartDate.Value = start.Date;
-                dtpStartTime.Value = DateTime.MinValue.Add(start.TimeOfDay);
                 dtpEndDate.Value = end.Date;
-                dtpEndTime.Value = DateTime.MinValue.Add(end.TimeOfDay);
+
+                // Set Time pickers using a valid base date (from the date pickers themselves)
+                dtpStartTime.Value = dtpStartDate.Value.Date.Add(start.TimeOfDay);
+                dtpEndTime.Value = dtpEndDate.Value.Date.Add(end.TimeOfDay);
 
                 chkAllDay.Checked = false;
                 cmbCategory.SelectedIndex = 0;
                 chkEnableReminder.Checked = false;
                 ToggleReminderControls(false);
             }
-            chkAllDay_CheckedChanged(chkAllDay, EventArgs.Empty); // Trigger initial time picker state
+            chkAllDay_CheckedChanged(chkAllDay, EventArgs.Empty);
         }
 
         private void LoadAndPopulateReminder(int eventId)
@@ -294,16 +318,28 @@ namespace reLIFE.WinFormsUI.Forms
 
         private DateTime GetStartDateTime()
         {
-            DateTime datePart = dtpStartDate.Value.Date;
-            TimeSpan timePart = chkAllDay.Checked ? TimeSpan.Zero : dtpStartTime.Value.TimeOfDay;
+            DateTime datePart = dtpStartDate.Value.Date; // Use the DATE picker for the date part
+            TimeSpan timePart = chkAllDay.Checked ? TimeSpan.Zero : dtpStartTime.Value.TimeOfDay; // Use the TIME picker for time
             return datePart.Add(timePart);
         }
 
         private DateTime GetEndDateTime()
         {
-            DateTime datePart = dtpEndDate.Value.Date;
-            if (chkAllDay.Checked) { return datePart.AddDays(1); } // Exclusive end for all-day
-            else { TimeSpan timePart = dtpEndTime.Value.TimeOfDay; return datePart.Add(timePart); }
+            DateTime datePart = dtpEndDate.Value.Date; // Use the DATE picker for the date part
+            if (chkAllDay.Checked)
+            {
+                // For all-day events, end time is start of next day (exclusive)
+                // Ensure the date part is taken from the *start date* if end date can be before start for all-day
+                // Or, if all-day always means the whole of dtpStartDate:
+                return dtpStartDate.Value.Date.AddDays(1);
+                // If all-day means the whole of dtpEndDate (as selected by user):
+                // return dtpEndDate.Value.Date.AddDays(1);
+            }
+            else
+            {
+                TimeSpan timePart = dtpEndTime.Value.TimeOfDay; // Use the TIME picker for time
+                return datePart.Add(timePart);
+            }
         }
 
         // --- Reminder Handling ---
@@ -374,11 +410,6 @@ namespace reLIFE.WinFormsUI.Forms
                 if (control is TextBoxBase || control is MaterialTextBox2 || control is MaterialMultiLineTextBox2) { control.Focus(); }
                 else if (control is NumericUpDown nud) { nud.Select(0, nud.Text.Length); }
             }
-        }
-
-        private void EventForm_Load_1(object sender, EventArgs e)
-        {
-
         }
     }
 }

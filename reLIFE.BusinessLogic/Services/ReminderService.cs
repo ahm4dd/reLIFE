@@ -11,13 +11,8 @@ namespace reLIFE.BusinessLogic.Services
     public class ReminderService
     {
         private readonly ReminderRepository _reminderRepository;
-        private readonly EventRepository _eventRepository; // To verify event ownership
+        private readonly EventRepository _eventRepository;
 
-        /// <summary>
-        /// Initializes a new instance of the ReminderService.
-        /// </summary>
-        /// <param name="reminderRepository">The repository for reminder data access.</param>
-        /// <param name="eventRepository">The repository for event data access (used for validation).</param>
         public ReminderService(ReminderRepository reminderRepository, EventRepository eventRepository)
         {
             _reminderRepository = reminderRepository ?? throw new ArgumentNullException(nameof(reminderRepository));
@@ -222,6 +217,65 @@ namespace reLIFE.BusinessLogic.Services
             }
         }
 
+
+        public List<Reminder> GetActiveUserReminders(int userId)
+        {
+            if (userId <= 0) throw new ArgumentException("Invalid User ID.", nameof(userId));
+
+            try
+            {
+                // 1. Get all future events for the user
+                //    We need a range slightly beyond now to catch reminders set far in advance
+                //    Let's fetch events starting from now (or slightly before).
+                DateTime rangeStart = DateTime.Now.AddHours(-1); // Look back slightly
+                // No practical upper end date limit for this approach
+                List<Event> futureEvents = _eventRepository.GetEventsByDateRange(userId, rangeStart, DateTime.MaxValue);
+
+                if (!futureEvents.Any())
+                {
+                    return new List<Reminder>(); // No future events, so no relevant reminders
+                }
+
+                // 2. Get reminders ONLY for those future events
+                var futureEventIds = futureEvents.Select(e => e.Id).ToList();
+                var allReminders = new List<Reminder>();
+
+                // Fetch reminders for each event (less efficient than one JOIN, but works with current repo)
+                // Consider adding a GetRemindersForEventList to the repo later for optimization
+                foreach (int eventId in futureEventIds)
+                {
+                    allReminders.AddRange(_reminderRepository.GetRemindersForEvent(eventId));
+                }
+
+                // 3. Filter for enabled reminders
+                //    (Could also filter by ReminderTime < upcomingLimit here if needed)
+                var activeReminders = allReminders
+                                        .Where(r => r.IsEnabled)
+                                        .ToList();
+
+                // 4. Optional: Order them by calculated reminder time (requires joining back to event start time)
+                //    This sorting is better done in the Repository JOIN method,
+                //    but we can do an approximate sort here.
+                var sortedReminders = activeReminders
+                    .Select(r => new
+                    {
+                        Reminder = r,
+                        EventStartTime = futureEvents.FirstOrDefault(e => e.Id == r.EventId)?.StartTime ?? DateTime.MaxValue
+                    })
+                    .OrderBy(x => x.EventStartTime.AddMinutes(-x.Reminder.MinutesBefore))
+                    .Select(x => x.Reminder)
+                    .ToList();
+
+                return sortedReminders;
+
+            }
+            catch (ApplicationException) { throw; }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected Service Error (GetActiveUserReminders): {ex.Message}");
+                throw new ApplicationException("An unexpected error occurred while retrieving reminders.", ex);
+            }
+        }
         // --- Optional: Method for checking upcoming reminders ---
         // This would be more complex, potentially involving joining Events and Reminders
         // and calculating trigger times. Omitted for now for simplicity.

@@ -142,5 +142,61 @@ namespace reLIFE.BusinessLogic.Repositories
                 ArchivedAt = reader.GetDateTime(reader.GetOrdinal("ArchivedAt"))
             };
         }
+
+        public ArchivedEvent? GetArchivedEventById(int archivedEventId, int userId)
+        {
+            if (archivedEventId <= 0 || userId <= 0) return null;
+
+            const string sql = @"
+                SELECT Id, UserId, CategoryId, Title, Description, StartTime, EndTime, IsAllDay, CreatedAt, LastModifiedAt, ArchivedAt
+                FROM ArchivedEvents
+                WHERE Id = @ArchivedEventId AND UserId = @UserId;";
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@ArchivedEventId", archivedEventId);
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return MapReaderToArchivedEvent(reader);
+                        }
+                        return null; // Not found or doesn't belong to user
+                    }
+                }
+            }
+            catch (SqlException ex) { /* ... error handling ... */ throw new ApplicationException("Error retrieving archived event by ID.", ex); }
+            catch (Exception ex) { /* ... error handling ... */ throw new ApplicationException("Unexpected error retrieving archived event by ID.", ex); }
+        }
+
+
+        // *** NEW METHOD: DeleteArchivedEvent ***
+        /// <summary>
+        /// Permanently deletes an archived event by its ID.
+        /// Consider adding userId parameter for ownership check if needed by service layer strategy.
+        /// </summary>
+        public bool DeleteArchivedEvent(int archivedEventId)
+        {
+            if (archivedEventId <= 0) return false;
+
+            const string sql = "DELETE FROM ArchivedEvents WHERE Id = @ArchivedEventId;";
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@ArchivedEventId", archivedEventId);
+                    connection.Open();
+                    int rowsAffected = command.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+            catch (SqlException ex) { /* ... error handling ... */ throw new ApplicationException($"Error deleting archived event ID {archivedEventId}.", ex); }
+            catch (Exception ex) { /* ... error handling ... */ throw new ApplicationException($"Unexpected error deleting archived event ID {archivedEventId}.", ex); }
+        }
     }
 }

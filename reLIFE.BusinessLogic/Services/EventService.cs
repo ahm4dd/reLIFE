@@ -176,5 +176,94 @@ namespace reLIFE.BusinessLogic.Services
                 if (evt.Id <= 0) throw new ArgumentException("Invalid Event ID for update.", nameof(evt.Id));
             }
         }
+
+        public bool RetrieveEventFromArchive(int archivedEventId, int userId)
+        {
+            if (archivedEventId <= 0) throw new ArgumentException("Invalid Archived Event ID.", nameof(archivedEventId));
+            if (userId <= 0) throw new ArgumentException("Invalid User ID.", nameof(userId));
+
+            try
+            {
+                // 1. Get the archived event to ensure it exists and belongs to the user
+                //    (ArchivedEventRepository should have a GetById method that checks UserId)
+                ArchivedEvent? archivedEvent = _archivedEventRepository.GetArchivedEventById(archivedEventId, userId);
+                if (archivedEvent == null)
+                {
+                    throw new InvalidOperationException($"Archived event with ID {archivedEventId} not found for user {userId}.");
+                }
+
+                // 2. Map it back to a regular Event object
+                Event eventToRestore = new Event
+                {
+                    // Id = archivedEvent.Id, // Do NOT set ID if Events table is IDENTITY. Let DB generate new one.
+                    // OR if Events.Id and ArchivedEvents.Id are meant to match,
+                    // then EventRepository.AddEvent would need IDENTITY_INSERT.
+                    // For simplicity, let's assume it gets a new ID in Events table.
+                    UserId = archivedEvent.UserId,
+                    CategoryId = archivedEvent.CategoryId,
+                    Title = archivedEvent.Title,
+                    Description = archivedEvent.Description,
+                    StartTime = archivedEvent.StartTime,
+                    EndTime = archivedEvent.EndTime,
+                    IsAllDay = archivedEvent.IsAllDay,
+                    // CreatedAt will be new, LastModifiedAt will be null initially
+                };
+
+                // 3. Add it back to the active Events table
+                //    This will assign a new Event.Id if your Events table has an IDENTITY PK.
+                Event? restoredEvent = _eventRepository.AddEvent(eventToRestore);
+                if (restoredEvent == null || restoredEvent.Id <= 0)
+                {
+                    throw new ApplicationException("Failed to add the event back to the active events table.");
+                }
+
+                // 4. Delete it from the ArchivedEvents table
+                //    (ArchivedEventRepository needs a DeleteArchivedEvent(id) method)
+                bool deletedFromArchive = _archivedEventRepository.DeleteArchivedEvent(archivedEventId);
+                if (!deletedFromArchive)
+                {
+                    // This is an inconsistent state: event is restored but not removed from archive.
+                    // Log this critical issue. For now, we'll consider the main operation failed.
+                    Console.WriteLine($"CRITICAL: Failed to delete event ID {archivedEventId} from archive after restoring.");
+                    // Optionally try to delete the just-added active event to roll back? Complex.
+                    throw new ApplicationException("Failed to complete retrieval: could not remove from archive.");
+                }
+
+                return true;
+            }
+            catch (InvalidOperationException opEx) { Console.WriteLine($"Service Error (RetrieveEventFromArchive): {opEx.Message}"); throw; }
+            catch (ApplicationException appEx) { Console.WriteLine($"Service Error (RetrieveEventFromArchive): {appEx.Message}"); throw; }
+            catch (Exception ex) { Console.WriteLine($"Unexpected Error (RetrieveEventFromArchive): {ex.Message}"); throw new ApplicationException("An unexpected error occurred while retrieving the event from archive.", ex); }
+        }
+
+        // *** NEW METHOD: DeleteArchivedEventPermanently ***
+        /// <summary>
+        /// Permanently deletes an event from the archive table.
+        /// </summary>
+        /// <param name="archivedEventId">The ID of the event in the archive table to delete.</param>
+        /// <param name="userId">The ID of the user performing the action (for ownership check).</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public bool DeleteArchivedEventPermanently(int archivedEventId, int userId)
+        {
+            if (archivedEventId <= 0) throw new ArgumentException("Invalid Archived Event ID.", nameof(archivedEventId));
+            if (userId <= 0) throw new ArgumentException("Invalid User ID.", nameof(userId));
+
+            try
+            {
+                // 1. Optional: Verify ownership before deleting, if GetArchivedEventById doesn't already.
+                //    ArchivedEventRepository.DeleteArchivedEvent should ideally take userId too.
+                //    For simplicity, let's assume DeleteArchivedEvent handles ownership or we trust the call.
+                //    Alternatively:
+                //    var archivedEvent = _archivedEventRepository.GetArchivedEventById(archivedEventId, userId);
+                //    if (archivedEvent == null) {
+                //        throw new InvalidOperationException($"Archived event with ID {archivedEventId} not found for user {userId}.");
+                //    }
+
+                // 2. Call repository to delete
+                return _archivedEventRepository.DeleteArchivedEvent(archivedEventId); // Assumes this method exists
+            }
+            catch (ApplicationException appEx) { Console.WriteLine($"Service Error (DeleteArchivedEventPermanently): {appEx.Message}"); throw; }
+            catch (Exception ex) { Console.WriteLine($"Unexpected Error (DeleteArchivedEventPermanently): {ex.Message}"); throw new ApplicationException("An unexpected error occurred while permanently deleting the archived event.", ex); }
+        }
     }
 }

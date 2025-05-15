@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             dashboardPanel = new Panel();
+            btnManageCategories = new MaterialSkin.Controls.MaterialButton();
             materialDivider1 = new MaterialSkin.Controls.MaterialDivider();
             btnLogout = new MaterialSkin.Controls.MaterialButton();
             btnAccountSettings = new MaterialSkin.Controls.MaterialButton();
@@ -44,6 +45,7 @@
             // dashboardPanel
             // 
             dashboardPanel.BackColor = Color.FromArgb(64, 64, 64);
+            dashboardPanel.Controls.Add(btnManageCategories);
             dashboardPanel.Controls.Add(materialDivider1);
             dashboardPanel.Controls.Add(btnLogout);
             dashboardPanel.Controls.Add(btnAccountSettings);
@@ -57,6 +59,27 @@
             dashboardPanel.Name = "dashboardPanel";
             dashboardPanel.Size = new Size(200, 548);
             dashboardPanel.TabIndex = 0;
+            // 
+            // btnManageCategories
+            // 
+            btnManageCategories.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnManageCategories.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnManageCategories.Depth = 0;
+            btnManageCategories.FlatStyle = FlatStyle.Flat;
+            btnManageCategories.HighEmphasis = true;
+            btnManageCategories.Icon = null;
+            btnManageCategories.Location = new Point(22, 270);
+            btnManageCategories.Margin = new Padding(4, 6, 4, 6);
+            btnManageCategories.MouseState = MaterialSkin.MouseState.HOVER;
+            btnManageCategories.Name = "btnManageCategories";
+            btnManageCategories.NoAccentTextColor = Color.Empty;
+            btnManageCategories.Size = new Size(109, 36);
+            btnManageCategories.TabIndex = 6;
+            btnManageCategories.Text = "Categories";
+            btnManageCategories.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnManageCategories.UseAccentColor = false;
+            btnManageCategories.UseVisualStyleBackColor = true;
+            btnManageCategories.Click += btnManageCategories_Click;
             // 
             // materialDivider1
             // 
@@ -98,7 +121,7 @@
             btnAccountSettings.FlatStyle = FlatStyle.Flat;
             btnAccountSettings.HighEmphasis = true;
             btnAccountSettings.Icon = null;
-            btnAccountSettings.Location = new Point(22, 366);
+            btnAccountSettings.Location = new Point(22, 414);
             btnAccountSettings.Margin = new Padding(4, 6, 4, 6);
             btnAccountSettings.MouseState = MaterialSkin.MouseState.HOVER;
             btnAccountSettings.Name = "btnAccountSettings";
@@ -119,7 +142,7 @@
             btnViewArchive.FlatStyle = FlatStyle.Flat;
             btnViewArchive.HighEmphasis = true;
             btnViewArchive.Icon = null;
-            btnViewArchive.Location = new Point(22, 318);
+            btnViewArchive.Location = new Point(22, 366);
             btnViewArchive.Margin = new Padding(4, 6, 4, 6);
             btnViewArchive.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewArchive.Name = "btnViewArchive";
@@ -130,6 +153,7 @@
             btnViewArchive.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnViewArchive.UseAccentColor = false;
             btnViewArchive.UseVisualStyleBackColor = true;
+            btnViewArchive.Click += btnViewArchive_Click;
             // 
             // btnViewReminders
             // 
@@ -139,7 +163,7 @@
             btnViewReminders.FlatStyle = FlatStyle.Flat;
             btnViewReminders.HighEmphasis = true;
             btnViewReminders.Icon = null;
-            btnViewReminders.Location = new Point(22, 270);
+            btnViewReminders.Location = new Point(22, 318);
             btnViewReminders.Margin = new Padding(4, 6, 4, 6);
             btnViewReminders.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewReminders.Name = "btnViewReminders";
@@ -150,6 +174,7 @@
             btnViewReminders.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnViewReminders.UseAccentColor = false;
             btnViewReminders.UseVisualStyleBackColor = true;
+            btnViewReminders.Click += btnViewReminders_Click;
             // 
             // btnCalendarView
             // 
@@ -222,5 +247,6 @@
         private MaterialSkin.Controls.MaterialButton btnAccountSettings;
         private Panel pnlContent;
         private MaterialSkin.Controls.MaterialDivider materialDivider1;
+        private MaterialSkin.Controls.MaterialButton btnManageCategories;
     }
 }

@@ -3,7 +3,6 @@ using MaterialSkin.Controls;
 using reLIFE.BusinessLogic.Repositories; // Needed for passing Archive Repo
 using reLIFE.BusinessLogic.Services;
 using reLIFE.Core.Models;
-using reLIFE.WinFormsUI.UserControls; // Namespace for your UserControls
 using System;
 using System.Windows.Forms;
 
@@ -60,11 +59,13 @@ namespace reLIFE.WinFormsUI.Forms
             btnLogout.AutoSize = false;
             btnViewArchive.AutoSize = false;
             btnViewReminders.AutoSize = false;
+            btnManageCategories.AutoSize = false;
             btnAccountSettings.Size = new Size(158, 36);
             btnCalendarView.Size = new Size(158, 36);
             btnLogout.Size = new Size(158, 36);
             btnViewArchive.Size = new Size(158, 36);
             btnViewReminders.Size = new Size(158, 36);
+            btnManageCategories.Size = new Size(158, 36);
             // btnAccountSettings.AutoSize = false; // etc. - remove unless specific sizing needed
 
             UpdateWindowTitle();
@@ -94,11 +95,11 @@ namespace reLIFE.WinFormsUI.Forms
         }
 
 
-        //private void btnViewArchive_Click(object sender, EventArgs e)
-        //{
-        //    // Load the archive viewing control
-        //    LoadControl(new ArchiveViewControl(_currentUser, _archivedEventRepository));
-        //}
+        private void btnViewArchive_Click(object sender, EventArgs e)
+        {
+            // Load the archive viewing control
+            LoadControl(new ArchiveViewForm(_currentUser, _archivedEventRepository, _eventService, _categoryService, _reminderService));
+        }
 
         //private void btnViewReminders_Click(object sender, EventArgs e)
         //{
@@ -179,6 +180,16 @@ namespace reLIFE.WinFormsUI.Forms
         private void UpdateWindowTitle()
         {
             this.Text = $"reLIFE Dashboard - [{_currentUser.Username}]";
+        }
+
+        private void btnManageCategories_Click(object sender, EventArgs e)
+        {
+            LoadControl(new CategoryManagerForm(_currentUser, _categoryService));
+        }
+
+        private void btnViewReminders_Click(object sender, EventArgs e)
+        {
+            LoadControl(new ReminderListViewForm(_currentUser, _reminderService, _eventService, _categoryService));
         }
 
 
