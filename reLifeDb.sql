@@ -30,7 +30,7 @@ CREATE TABLE Events (
     CreatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
     LastModifiedAt DATETIME2 NULL,
     CONSTRAINT FK_Events_User FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
-    CONSTRAINT FK_Events_Category FOREIGN KEY (CategoryId) REFERENCES Categories(Id) ON DELETE NO ACTION
+    CONSTRAINT FK_Events_Category FOREIGN KEY (CategoryId) REFERENCES Categories(Id) ON DELETE NO ACTION ON UPDATE CASCADE
 );
 CREATE INDEX IX_Events_UserId_StartTime ON Events(UserId, StartTime); -- Useful for fetching events by date
 
