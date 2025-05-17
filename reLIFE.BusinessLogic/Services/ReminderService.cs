@@ -218,6 +218,23 @@ namespace reLIFE.BusinessLogic.Services
         }
 
 
+        public List<ReminderInfo> GetActiveUpcomingReminderInfos(int userId, DateTime? onlyUpcomingUntil = null)
+        {
+            if (userId <= 0) throw new ArgumentException("Invalid User ID.", nameof(userId));
+
+            try
+            {
+                // Directly call the repository method that returns ReminderInfo
+                return _reminderRepository.GetActiveUpcomingReminderInfosForUser(userId, onlyUpcomingUntil);
+            }
+            catch (ApplicationException) { throw; } // Re-throw repo/db errors
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected Service Error (GetActiveUpcomingReminderInfos): {ex.Message}");
+                throw new ApplicationException("An unexpected error occurred while retrieving reminders.", ex);
+            }
+        }
+
         public List<Reminder> GetActiveUserReminders(int userId)
         {
             if (userId <= 0) throw new ArgumentException("Invalid User ID.", nameof(userId));
