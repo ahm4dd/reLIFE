@@ -87,3 +87,4 @@ CREATE TABLE Reminders (
 
 -- Index to efficiently find reminders for a specific event
 CREATE INDEX IX_Reminders_EventId ON Reminders(EventId);
+
