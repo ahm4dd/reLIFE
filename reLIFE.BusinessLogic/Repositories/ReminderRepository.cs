@@ -230,6 +230,63 @@ namespace reLIFE.BusinessLogic.Repositories
             catch (Exception ex) { /* ... standard error handling ... */ throw new ApplicationException("Unexpected error retrieving reminder by ID.", ex); }
         }
 
+        public List<ReminderInfo> GetActiveUpcomingReminderInfosForUser(int userId, DateTime? upcomingLimit = null)
+        {
+            var reminderInfos = new List<ReminderInfo>();
+            string sql = @"
+                SELECT
+                    r.Id AS ReminderId,
+                    r.EventId,
+                    e.Title AS EventTitle,
+                    e.StartTime AS EventStartTime,
+                    r.MinutesBefore,
+                    r.IsEnabled
+                FROM Reminders r
+                INNER JOIN Events e ON r.EventId = e.Id
+                WHERE
+                    e.UserId = @UserId
+                    AND r.IsEnabled = 1          -- Only enabled reminders
+                    AND e.StartTime > GETDATE()  -- Only for events that haven't started yet
+                    AND e.IsArchived = 0       -- Only for non-archived events
+                    " + (upcomingLimit.HasValue ? "AND DATEADD(minute, -r.MinutesBefore, e.StartTime) <= @UpcomingLimit " : "") +
+               @"ORDER BY
+                    DATEADD(minute, -r.MinutesBefore, e.StartTime) ASC; -- Order by actual reminder due time";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    if (upcomingLimit.HasValue)
+                    {
+                        command.Parameters.AddWithValue("@UpcomingLimit", upcomingLimit.Value);
+                    }
+
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            reminderInfos.Add(new ReminderInfo
+                            {
+                                ReminderId = reader.GetInt32(reader.GetOrdinal("ReminderId")),
+                                EventId = reader.GetInt32(reader.GetOrdinal("EventId")),
+                                EventTitle = reader.GetString(reader.GetOrdinal("EventTitle")),
+                                EventStartTime = reader.GetDateTime(reader.GetOrdinal("EventStartTime")),
+                                MinutesBefore = reader.GetInt32(reader.GetOrdinal("MinutesBefore")),
+                                IsEnabled = reader.GetBoolean(reader.GetOrdinal("IsEnabled"))
+                            });
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex) { Console.WriteLine($"SQL Error retrieving user reminders: {ex.Message}"); throw new ApplicationException("Error retrieving user reminders.", ex); }
+            catch (Exception ex) { Console.WriteLine($"General Error retrieving user reminders: {ex.Message}"); throw new ApplicationException("Unexpected error retrieving user reminders.", ex); }
+
+            return reminderInfos;
+        }
+
 
         /// <summary>
         /// Helper method to map a SqlDataReader row to a Reminder object.

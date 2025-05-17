@@ -18,8 +18,9 @@ namespace reLIFE.WinFormsUI.Forms
         private readonly EventService _eventService;
         private readonly CategoryService _categoryService; // Still needed for EventForm
 
+
         // --- Data ---
-        private List<Reminder> _activeReminders = new List<Reminder>();
+        private List<ReminderInfo> _activeReminders = new List<ReminderInfo>();
         // --- NEW: Cache for event details to avoid repeated lookups ---
         private Dictionary<int, Event> _eventDetailCache = new Dictionary<int, Event>();
 
@@ -55,12 +56,14 @@ namespace reLIFE.WinFormsUI.Forms
         private void LoadAndDisplayReminders()
         {
             this.Cursor = Cursors.WaitCursor;
-            _eventDetailCache.Clear(); // Clear cache on refresh
             Application.DoEvents();
             try
             {
-                // Use the service method that returns List<Reminder>
-                _activeReminders = _reminderService.GetActiveUserReminders(_currentUser.Id);
+                // Use the service method that returns List<ReminderInfo>
+                // Example: Get reminders due in the next 7 days
+                // _activeReminders = _reminderService.GetActiveUpcomingReminderInfos(_currentUser.Id, DateTime.Now.AddDays(7));
+                // Or get all future active ones:
+                _activeReminders = _reminderService.GetActiveUpcomingReminderInfos(_currentUser.Id);
                 DisplayReminders();
             }
             catch (Exception ex) { HandleLoadError("loading reminders", ex); }
@@ -72,22 +75,12 @@ namespace reLIFE.WinFormsUI.Forms
             flpReminders.SuspendLayout();
             while (flpReminders.Controls.Count > 0) { flpReminders.Controls[0].Dispose(); }
 
-            if (_activeReminders.Any())
+            if (_activeReminders.Any()) // Already ordered by the service/repo
             {
-                foreach (var reminder in _activeReminders)
+                foreach (var reminderInfo in _activeReminders)
                 {
-                    // Fetch event details (use cache)
-                    Event? relatedEvent = GetEventDetails(reminder.EventId);
-                    if (relatedEvent != null) // Only display if we can get event details
-                    {
-                        MaterialCard card = CreateReminderCard(reminder, relatedEvent);
-                        flpReminders.Controls.Add(card);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Warning: Could not find event details for Event ID {reminder.EventId} associated with Reminder ID {reminder.Id}. Skipping card.");
-                        // Optionally display a card indicating an orphaned reminder?
-                    }
+                    MaterialCard card = CreateReminderCard(reminderInfo);
+                    flpReminders.Controls.Add(card);
                 }
             }
             else
@@ -122,41 +115,39 @@ namespace reLIFE.WinFormsUI.Forms
         }
 
 
-        // --- Reminder Card Creation (Uses Reminder and Event) ---
-        private MaterialCard CreateReminderCard(Reminder reminder, Event relatedEvent) // Takes both objects
-        {
-            // Calculate reminder time here
-            DateTime reminderDueTime = relatedEvent.StartTime.AddMinutes(-reminder.MinutesBefore);
 
-            MaterialCard card = new MaterialCard { Width = flpReminders.Width - 30, Margin = new Padding(10), Padding = new Padding(10), Tag = reminder, AutoSize = true }; // Tag is Reminder object
+
+        // --- Reminder Card Creation (Uses Reminder and Event) ---
+        private MaterialCard CreateReminderCard(ReminderInfo reminderInfo)
+        {
+            // ReminderInfo already has EventTitle and EventStartTime
+            MaterialCard card = new MaterialCard { Width = flpReminders.Width - 30, Margin = new Padding(10), Padding = new Padding(10), Tag = reminderInfo, AutoSize = true }; // Tag is ReminderInfo
             TableLayoutPanel layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, AutoSize = true, ColumnStyles = { new ColumnStyle(SizeType.Percent, 100F), new ColumnStyle(SizeType.Absolute, 95) } };
             card.Controls.Add(layout);
 
-            // Col 0: Main Content Panel
             FlowLayoutPanel mainContentPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, AutoScroll = false, AutoSize = true, Padding = new Padding(5, 0, 0, 0) };
             layout.Controls.Add(mainContentPanel, 0, 0);
 
-            MaterialLabel lblEventTitle = new MaterialLabel { Text = relatedEvent.Title, UseAccent = true,FontType = MaterialSkin.MaterialSkinManager.fontType.Subtitle1, HighEmphasis = true, AutoSize = true, MaximumSize = new Size(card.Width - 130, 0), Margin = new Padding(0, 0, 0, 3) };
+            MaterialLabel lblEventTitle = new MaterialLabel { Text = reminderInfo.EventTitle, UseAccent = true, FontType = MaterialSkin.MaterialSkinManager.fontType.Subtitle1, HighEmphasis = true, AutoSize = true, MaximumSize = new Size(card.Width - 130, 0), Margin = new Padding(0, 0, 0, 3) };
             mainContentPanel.Controls.Add(lblEventTitle);
 
-            MaterialLabel lblReminderTime = new MaterialLabel { Text = $"Reminder due: {reminderDueTime:g}", FontType = MaterialSkin.MaterialSkinManager.fontType.Body1, UseAccent = true, AutoSize = true, Margin = new Padding(0, 0, 0, 3) };
+            MaterialLabel lblReminderTime = new MaterialLabel { Text = $"Reminder due: {reminderInfo.ReminderTime:g}", FontType = MaterialSkin.MaterialSkinManager.fontType.Body1, UseAccent = true, AutoSize = true, Margin = new Padding(0, 0, 0, 3) };
             mainContentPanel.Controls.Add(lblReminderTime);
 
-            MaterialLabel lblEventTime = new MaterialLabel { Text = $"Event starts: {relatedEvent.StartTime:g}", FontType = MaterialSkin.MaterialSkinManager.fontType.Caption, Depth = 1, HighEmphasis = false, AutoSize = true, Margin = new Padding(0, 0, 0, 3) };
+            MaterialLabel lblEventTime = new MaterialLabel { Text = $"Event starts: {reminderInfo.EventStartTime:g}", FontType = MaterialSkin.MaterialSkinManager.fontType.Caption, Depth = 1, HighEmphasis = false, AutoSize = true, Margin = new Padding(0, 0, 0, 3) };
             mainContentPanel.Controls.Add(lblEventTime);
 
-            MaterialLabel lblSetting = new MaterialLabel { Text = $"({reminder.MinutesBefore} minutes before)", FontType = MaterialSkin.MaterialSkinManager.fontType.Caption, Depth = 1, HighEmphasis = false, AutoSize = true, Margin = new Padding(0, 0, 0, 3) };
+            MaterialLabel lblSetting = new MaterialLabel { Text = $"({reminderInfo.MinutesBefore} minutes before)", FontType = MaterialSkin.MaterialSkinManager.fontType.Caption, Depth = 1, HighEmphasis = false, AutoSize = true, Margin = new Padding(0, 0, 0, 3) };
             mainContentPanel.Controls.Add(lblSetting);
 
-            // Col 1: Buttons Panel
             FlowLayoutPanel buttonPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, Padding = new Padding(5, 0, 0, 0), Margin = new Padding(0), WrapContents = false, AutoSize = true };
             layout.Controls.Add(buttonPanel, 1, 0);
 
-            MaterialButton btnViewEvent = new MaterialButton { Text = "View", UseAccentColor = true,Tag = reminder, Type = MaterialButton.MaterialButtonType.Text, Margin = new Padding(1), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, MinimumSize = new Size(90, 28) };
+            MaterialButton btnViewEvent = new MaterialButton { Text = "View", UseAccentColor = true, Tag = reminderInfo, Type = MaterialButton.MaterialButtonType.Text, Margin = new Padding(1), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, MinimumSize = new Size(90, 28) };
             btnViewEvent.Click += CardButton_Click;
             buttonPanel.Controls.Add(btnViewEvent);
 
-            MaterialButton btnDeleteReminder = new MaterialButton { Text = "Delete", Tag = reminder, Type = MaterialButton.MaterialButtonType.Text, Margin = new Padding(1), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, MinimumSize = new Size(90, 28) };
+            MaterialButton btnDeleteReminder = new MaterialButton { Text = "Delete", Tag = reminderInfo, Type = MaterialButton.MaterialButtonType.Text, Margin = new Padding(1), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, MinimumSize = new Size(90, 28) };
             btnDeleteReminder.Click += CardButton_Click;
             buttonPanel.Controls.Add(btnDeleteReminder);
 
@@ -166,15 +157,15 @@ namespace reLIFE.WinFormsUI.Forms
         // --- Card Button Click Handler (Uses Reminder object) ---
         private void CardButton_Click(object? sender, EventArgs e)
         {
-            if (sender is MaterialButton button && button.Tag is Reminder targetReminder) // Tag is Reminder now
+            if (sender is MaterialButton button && button.Tag is ReminderInfo targetReminderInfo)
             {
                 if (button.Text == "View")
                 {
-                    ViewEvent(targetReminder.EventId); // Use EventId from Reminder
+                    ViewEvent(targetReminderInfo.EventId);
                 }
                 else if (button.Text == "Delete")
                 {
-                    DeleteReminder(targetReminder); // Pass the Reminder object
+                    DeleteReminder(targetReminderInfo); // Pass ReminderInfo
                 }
             }
         }
@@ -185,7 +176,7 @@ namespace reLIFE.WinFormsUI.Forms
             SetProcessingState(true);
             try
             {
-                Event? eventToView = GetEventDetails(eventId); // Use helper which uses cache
+                Event? eventToView = _eventService.GetEventById(eventId, _currentUser.Id); // Fetch full event
                 if (eventToView != null)
                 {
                     using (var eventForm = new EventForm(_currentUser, _eventService, _categoryService, _reminderService, eventToView))
@@ -195,29 +186,21 @@ namespace reLIFE.WinFormsUI.Forms
                         eventForm.ShowDialog(this.FindForm());
                         skinManager.RemoveFormToManage(eventForm);
                     }
-                    LoadAndDisplayReminders(); // Refresh in case reminder changed
+                    LoadAndDisplayReminders(); // Refresh list after EventForm closes
                 }
-                else
-                {
-                    MessageBox.Show("Could not find the associated event.", "Event Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    LoadAndDisplayReminders(); // Refresh list
-                }
+                else { MessageBox.Show("Could not find the associated event.", "Event Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning); LoadAndDisplayReminders(); }
             }
             catch (Exception ex) { HandleActionError("viewing event", ex); }
             finally { SetProcessingState(false); }
         }
 
-        private void DeleteReminder(Reminder reminderToDelete) // Takes Reminder object
+        private void DeleteReminder(ReminderInfo reminderToDelete) // Takes ReminderInfo
         {
-            // Get event title for confirmation message (use cache)
-            string eventTitle = GetEventDetails(reminderToDelete.EventId)?.Title ?? "Unknown Event";
-
-            var confirm = MessageBox.Show($"Are you sure you want to delete the reminder for '{eventTitle}'?",
-                                            "Confirm Delete Reminder", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var confirm = MessageBox.Show($"Are you sure you want to delete the reminder for '{reminderToDelete.EventTitle}'?", "Confirm Delete Reminder", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (confirm == DialogResult.Yes)
             {
                 PerformActionWithRefresh(
-                    () => _reminderService.DeleteReminder(reminderToDelete.Id, _currentUser.Id),
+                    () => _reminderService.DeleteReminder(reminderToDelete.ReminderId, _currentUser.Id), // Use ReminderId
                     "deleting reminder",
                     "Reminder deleted.");
             }
