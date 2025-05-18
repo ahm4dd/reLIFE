@@ -14,6 +14,7 @@ The primary goal of the "reLIFE Scheduler" project is to develop a functional an
 **1.2 Problem Statement:**
 In an increasingly busy world, individuals often struggle to manage a multitude of personal and professional commitments effectively. Relying on memory or scattered notes can lead to missed appointments, forgotten tasks, and a general sense of disorganization. While numerous web-based and mobile calendar solutions exist, some users prefer or require a dedicated, local desktop application that offers simplicity, privacy, and focused functionality without the distractions or potential complexities of cloud-based services.
 
+**1.3 Proposed Solution:**
 The reLIFE Scheduler addresses this by providing a secure, standalone application where users can:
 *   Confidently store and manage their personal schedule.
 *   Visually distinguish between different types of activities through categorization.
