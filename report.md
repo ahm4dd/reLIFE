@@ -37,6 +37,15 @@ The database for reLIFE Scheduler is designed using Microsoft SQL Server and con
 *   **Events:** Belong to one User and can optionally belong to one Category. One User can have many Events.
 *   **ArchivedEvents:** Stores historical data from Events. Belongs to one User and can optionally reference a Category.
 *   **Reminders:** Belong to one Event. One Event can have many Reminders.
+  
+*   **Key Concepts Applied:**
+    *   Relational Database Design
+    *   Normalization (to a practical extent for this application size)
+    *   Data Integrity (Primary Keys, Foreign Keys, Unique Constraints, Check Constraints where applicable)
+    *   SQL (Data Definition Language - DDL for table creation; Data Manipulation Language - DML for CRUD operations)
+    *   Layered Application Architecture (Presentation, Business Logic, Core/Data Access)
+    *   Secure Password Storage Principles
+
 
 **2.2 Table Definitions:**
 
@@ -171,6 +180,38 @@ The database for reLIFE Scheduler is designed using Microsoft SQL Server and con
 *   Repositories in the Business Logic Layer are responsible for constructing and executing raw SQL queries (SELECT, INSERT, UPDATE, DELETE).
 *   Parameterized queries are used exclusively to prevent SQL injection vulnerabilities.
 *   The `DbHelper` class centralizes the retrieval of the database connection string from `appsettings.json`.
+
+**5. Future Work and Potential Enhancements**
+
+While the current version of reLIFE Scheduler provides a solid set of core features, several enhancements could be considered for future development, many of which would involve database schema modifications or new interaction patterns:
+
+*   **Advanced Recurring Events:**
+    *   **Schema Changes:** Introduce a dedicated `RecurrencePatterns` table to store complex rules (e.g., daily, weekly on specific days, monthly by date, monthly by Nth weekday, yearly). The `Events` table would then link to this table for master recurring events. The existing `EventExceptions` table (if implemented) would handle deviations from the master pattern.
+    *   **Impact:** This is a significant feature that would greatly enhance scheduling power but also adds complexity to event generation logic and querying.
+*   **Event Sharing & Collaboration (Multiple Users):**
+    *   **Schema Changes:** Requires a junction table like `EventParticipants` (`EventId`, `UserId`, `Role`), and modifications to event ownership or visibility rules.
+    *   **Impact:** Transforms the application from purely personal to potentially collaborative.
+*   **Reminder Sounds/Actions:**
+    *   **Schema Changes:** `Reminders` table could be extended with `SoundFile`, `ActionType` (e.g., open application, show message).
+    *   **Impact:** More flexible reminder notifications.
+*   **Time Zone Support:**
+    *   **Schema Changes:** Store all `DATETIME2` values as UTC in the database. Add a `TimeZoneId` column to the `Users` table (or `Events` table if events can have their own time zones) to store the user's preferred time zone.
+    *   **Impact:** Essential for users who travel or schedule across different time zones. Application logic would need to convert times for display.
+*   **User Settings Persistence:**
+    *   **Schema Changes:** A `UserSettings` table (`UserId`, `SettingKey`, `SettingValue`) to store preferences like default view, theme, reminder defaults.
+    *   **Impact:** Enhances user experience.
+
+**6. References & Technologies Used**
+
+*   **Development Environment:** Microsoft Visual Studio 2022
+*   **Programming Language:** C# (.NET 8.0)
+*   **User Interface:** Windows Forms (WinForms), MaterialSkin 2 for .NET
+*   **Database Management System:** SQL Server Management Studio 20.2
+*   **Database Interaction:** ADO.NET (`Microsoft.Data.SqlClient` library)
+*   **Password Hashing:** SHA256 algorithm with per-user salting.
+*   **Configuration:** `appsettings.json`
+*   **Version Control:** Git, GitHub (or other)
+
 
 **5. Conclusion**
 
