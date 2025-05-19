@@ -13,7 +13,8 @@ using reLIFE.Core.Models;           // For User model
 using reLIFE.WinFormsUI.Forms;      // For your form classes
 using reLIFE.WinFormsUI.Helpers;    // For ThemeHelper
 using MaterialSkin;                     // For MaterialSkinManager
-using Microsoft.Data.SqlClient;           // Needed for connection test
+using Microsoft.Data.SqlClient;
+using System.Runtime.InteropServices;           // Needed for connection test
 
 namespace reLIFE.WinFormsUI
 {
@@ -41,7 +42,7 @@ namespace reLIFE.WinFormsUI
             // --- Step 1: Set Initial Theme using ThemeHelper ---
             // Load saved theme/scheme here in a real app, or use defaults
             ThemeHelper.ApplyTheme(MaterialSkinManager.Themes.LIGHT, ThemeHelper.BlueScheme, "Blue");
-
+            
 
             // Declare services needed - initialize within try block
             AuthService? authService = null;
