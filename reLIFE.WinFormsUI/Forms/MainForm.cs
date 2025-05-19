@@ -4,6 +4,8 @@ using reLIFE.BusinessLogic.Repositories; // Needed for passing Archive Repo
 using reLIFE.BusinessLogic.Services;
 using reLIFE.Core.Models;
 using System;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace reLIFE.WinFormsUI.Forms
@@ -33,13 +35,11 @@ namespace reLIFE.WinFormsUI.Forms
             )
         {
             InitializeComponent();
-
             // *** ADD FORM TO MANAGER HERE (Only Once) ***
             MaterialSkinManager.Instance.AddFormToManage(this);
 
             // *** Parent Panel DOES NOT SCROLL ***
             pnlContent.AutoScroll = false;
-
             // Store dependencies
             _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
             // ... (store other dependencies) ...

@@ -44,7 +44,6 @@ namespace reLIFE.WinFormsUI.Forms
             materialLabel5 = new MaterialSkin.Controls.MaterialLabel();
             cmbCategory = new MaterialSkin.Controls.MaterialComboBox();
             lblError = new MaterialSkin.Controls.MaterialLabel();
-            materialDivider3 = new MaterialSkin.Controls.MaterialDivider();
             chkEnableReminder = new MaterialSkin.Controls.MaterialCheckbox();
             nudReminderMinutes = new NumericUpDown();
             lblMinutesBefore = new MaterialSkin.Controls.MaterialLabel();
@@ -138,10 +137,16 @@ namespace reLIFE.WinFormsUI.Forms
             // 
             // dtpStartDate
             // 
+            dtpStartDate.BorderColor = Color.PaleVioletRed;
+            dtpStartDate.BorderSize = 0;
+            dtpStartDate.Font = new Font("Segoe UI", 9.5F);
             dtpStartDate.Location = new Point(17, 329);
+            dtpStartDate.MinimumSize = new Size(4, 35);
             dtpStartDate.Name = "dtpStartDate";
-            dtpStartDate.Size = new Size(200, 23);
+            dtpStartDate.Size = new Size(200, 35);
+            dtpStartDate.SkinColor = Color.MediumSlateBlue;
             dtpStartDate.TabIndex = 6;
+            dtpStartDate.TextColor = Color.White;
             // 
             // materialLabel3
             // 
@@ -169,10 +174,16 @@ namespace reLIFE.WinFormsUI.Forms
             // 
             // dtpEndDate
             // 
+            dtpEndDate.BorderColor = Color.PaleVioletRed;
+            dtpEndDate.BorderSize = 0;
+            dtpEndDate.Font = new Font("Segoe UI", 9.5F);
             dtpEndDate.Location = new Point(238, 329);
+            dtpEndDate.MinimumSize = new Size(4, 35);
             dtpEndDate.Name = "dtpEndDate";
-            dtpEndDate.Size = new Size(200, 23);
+            dtpEndDate.Size = new Size(200, 35);
+            dtpEndDate.SkinColor = Color.MediumSlateBlue;
             dtpEndDate.TabIndex = 9;
+            dtpEndDate.TextColor = Color.White;
             // 
             // chkAllDay
             // 
@@ -240,28 +251,17 @@ namespace reLIFE.WinFormsUI.Forms
             // 
             lblError.Depth = 0;
             lblError.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblError.Location = new Point(17, 774);
+            lblError.Location = new Point(17, 676);
             lblError.MouseState = MaterialSkin.MouseState.HOVER;
             lblError.Name = "lblError";
             lblError.Size = new Size(278, 36);
             lblError.TabIndex = 14;
             // 
-            // materialDivider3
-            // 
-            materialDivider3.BackColor = Color.FromArgb(30, 0, 0, 0);
-            materialDivider3.Depth = 0;
-            materialDivider3.Location = new Point(-8, 621);
-            materialDivider3.MouseState = MaterialSkin.MouseState.HOVER;
-            materialDivider3.Name = "materialDivider3";
-            materialDivider3.Size = new Size(496, 23);
-            materialDivider3.TabIndex = 15;
-            materialDivider3.Text = "materialDivider3";
-            // 
             // chkEnableReminder
             // 
             chkEnableReminder.AutoSize = true;
             chkEnableReminder.Depth = 0;
-            chkEnableReminder.Location = new Point(17, 669);
+            chkEnableReminder.Location = new Point(239, 544);
             chkEnableReminder.Margin = new Padding(0);
             chkEnableReminder.MouseLocation = new Point(-1, -1);
             chkEnableReminder.MouseState = MaterialSkin.MouseState.HOVER;
@@ -276,7 +276,7 @@ namespace reLIFE.WinFormsUI.Forms
             // 
             // nudReminderMinutes
             // 
-            nudReminderMinutes.Location = new Point(240, 677);
+            nudReminderMinutes.Location = new Point(244, 584);
             nudReminderMinutes.Name = "nudReminderMinutes";
             nudReminderMinutes.Size = new Size(74, 23);
             nudReminderMinutes.TabIndex = 17;
@@ -286,7 +286,7 @@ namespace reLIFE.WinFormsUI.Forms
             lblMinutesBefore.AutoSize = true;
             lblMinutesBefore.Depth = 0;
             lblMinutesBefore.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblMinutesBefore.Location = new Point(320, 678);
+            lblMinutesBefore.Location = new Point(324, 586);
             lblMinutesBefore.MouseState = MaterialSkin.MouseState.HOVER;
             lblMinutesBefore.Name = "lblMinutesBefore";
             lblMinutesBefore.Size = new Size(107, 19);
@@ -297,7 +297,7 @@ namespace reLIFE.WinFormsUI.Forms
             // 
             materialDivider4.BackColor = Color.FromArgb(30, 0, 0, 0);
             materialDivider4.Depth = 0;
-            materialDivider4.Location = new Point(-8, 723);
+            materialDivider4.Location = new Point(-8, 628);
             materialDivider4.MouseState = MaterialSkin.MouseState.HOVER;
             materialDivider4.Name = "materialDivider4";
             materialDivider4.Size = new Size(496, 23);
@@ -311,7 +311,7 @@ namespace reLIFE.WinFormsUI.Forms
             btnSave.Depth = 0;
             btnSave.HighEmphasis = true;
             btnSave.Icon = null;
-            btnSave.Location = new Point(387, 774);
+            btnSave.Location = new Point(389, 676);
             btnSave.Margin = new Padding(4, 6, 4, 6);
             btnSave.MouseState = MaterialSkin.MouseState.HOVER;
             btnSave.Name = "btnSave";
@@ -331,7 +331,7 @@ namespace reLIFE.WinFormsUI.Forms
             btnCancel.Depth = 0;
             btnCancel.HighEmphasis = true;
             btnCancel.Icon = null;
-            btnCancel.Location = new Point(302, 774);
+            btnCancel.Location = new Point(304, 676);
             btnCancel.Margin = new Padding(4, 6, 4, 6);
             btnCancel.MouseState = MaterialSkin.MouseState.HOVER;
             btnCancel.Name = "btnCancel";
@@ -358,10 +358,16 @@ namespace reLIFE.WinFormsUI.Forms
             // 
             // dtpStartTime
             // 
+            dtpStartTime.BorderColor = Color.PaleVioletRed;
+            dtpStartTime.BorderSize = 0;
+            dtpStartTime.Font = new Font("Segoe UI", 9.5F);
             dtpStartTime.Location = new Point(17, 401);
+            dtpStartTime.MinimumSize = new Size(4, 35);
             dtpStartTime.Name = "dtpStartTime";
-            dtpStartTime.Size = new Size(200, 23);
+            dtpStartTime.Size = new Size(200, 35);
+            dtpStartTime.SkinColor = Color.MediumSlateBlue;
             dtpStartTime.TabIndex = 23;
+            dtpStartTime.TextColor = Color.White;
             // 
             // materialLabel7
             // 
@@ -377,16 +383,22 @@ namespace reLIFE.WinFormsUI.Forms
             // 
             // dtpEndTime
             // 
+            dtpEndTime.BorderColor = Color.PaleVioletRed;
+            dtpEndTime.BorderSize = 0;
+            dtpEndTime.Font = new Font("Segoe UI", 9.5F);
             dtpEndTime.Location = new Point(238, 401);
+            dtpEndTime.MinimumSize = new Size(4, 35);
             dtpEndTime.Name = "dtpEndTime";
-            dtpEndTime.Size = new Size(200, 23);
+            dtpEndTime.Size = new Size(200, 35);
+            dtpEndTime.SkinColor = Color.MediumSlateBlue;
             dtpEndTime.TabIndex = 25;
+            dtpEndTime.TextColor = Color.White;
             // 
             // EventForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(458, 835);
+            ClientSize = new Size(458, 732);
             Controls.Add(materialLabel7);
             Controls.Add(dtpEndTime);
             Controls.Add(materialLabel6);
@@ -397,7 +409,6 @@ namespace reLIFE.WinFormsUI.Forms
             Controls.Add(lblMinutesBefore);
             Controls.Add(nudReminderMinutes);
             Controls.Add(chkEnableReminder);
-            Controls.Add(materialDivider3);
             Controls.Add(lblError);
             Controls.Add(cmbCategory);
             Controls.Add(materialLabel5);
@@ -438,7 +449,6 @@ namespace reLIFE.WinFormsUI.Forms
         private MaterialSkin.Controls.MaterialLabel materialLabel5;
         private MaterialSkin.Controls.MaterialComboBox cmbCategory;
         private MaterialSkin.Controls.MaterialLabel lblError;
-        private MaterialSkin.Controls.MaterialDivider materialDivider3;
         private MaterialSkin.Controls.MaterialCheckbox chkEnableReminder;
         private NumericUpDown nudReminderMinutes;
         private MaterialSkin.Controls.MaterialLabel lblMinutesBefore;
